@@ -1,0 +1,84 @@
+@import "root"
+
+@mixin respond-to($media)
+	@if $media == handhelds
+		@media only screen and (max-device-width: 40rem)
+			@content
+
+	@else if $media == medium-screens
+		@media only screen and (min-device-width: 40rem)
+			@content
+
+	@else if $media == wide-screens
+		@media only screen and (min-width: 1000px)
+			@content
+
+@mixin partialButton
+	button
+		width: 100% !important
+		height: 100% !important
+		text-align: center !important
+		margin: 0 !important
+
+		@include respond-to(handhelds)
+			font-size: 3rem
+
+		@include respond-to(medium-screens)
+			font-size: 1.5rem
+
+@mixin hoverMe
+	&:hover
+		button
+			color: grey !important
+
+@mixin shadow
+	box-shadow: 0px 0px 30px silver
+
+@mixin noselect
+	-webkit-touch-callout: none
+	-webkit-user-select: none
+	-khtml-user-select: none
+	-moz-user-select: none
+	-ms-user-select: none
+	user-select: none
+	pointer-events: none
+
+@mixin formBasic
+	display: block
+	padding: 2rem
+	background: $background-color-content
+	border-radius: 0.7rem
+	min-height: 20rem
+	margin: auto
+	margin-top: 2rem
+	margin-bottom: 2rem
+	@include shadow
+
+	@include respond-to(handhelds)
+		font-size: 2.5em
+		margin-left: -0.8em
+		margin-right: -0.8em
+		border-radius: 0
+
+	@include respond-to(medium-screens)
+		max-width: 40rem
+
+	@include respond-to(wide-screens)
+		max-width: 40rem
+
+	input
+		@include respond-to(handhelds)
+			font-size: 3rem
+			border-radius: 0.5rem
+
+	.check
+		position: static
+		@include respond-to(handhelds)
+			width: 2rem !important
+			height: 2rem !important
+
+	button
+		@include respond-to(handhelds)
+			font-size: 3rem
+			padding: 1rem
+			border-radius: 1rem

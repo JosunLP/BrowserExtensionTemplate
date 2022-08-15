@@ -1,0 +1,32 @@
+{
+    "name": "BrowserExtensionTemplate",
+    "version": "2.2.5",
+    "manifest_version": 3,
+    "description": "A Extension created for the FearNixx Community to monitor the uptime status.",
+    "homepage_url": "https://github.com/JosunLP/BrowserExtensionTemplate",
+    "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+    },
+    "action": {
+        "default_icon": "icons/icon16.png",
+        "default_title": "BrowserExtensionTemplate",
+        "default_popup": "popup.html"
+    },
+    "permissions": [
+        "notifications"
+    ],
+    "background": {
+        "service_worker": "js/background.js"
+      },
+    "commands": {
+        "_execute_browser_action": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+F",
+                "mac": "MacCtrl+Shift+F"
+            },
+            "description": "Opens popup.html"
+        }
+    }
+}

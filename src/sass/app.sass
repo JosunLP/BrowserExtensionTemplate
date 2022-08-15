@@ -1,0 +1,42 @@
+@import 'root'
+@import 'mixin'
+@import 'content'
+@import '../../node_modules/bootstrap/scss/bootstrap'
+
+body
+    height: 30rem
+    width: 30rem
+    background-color: $background-color
+    text-align: center
+    margin: auto
+    padding: auto
+    color: $main-font-color
+
+    @include partialButton
+
+h1, h2
+    @include noselect
+
+form
+    @include formBasic
+
+.logo
+    width: 5rem
+    height: auto
+    padding-top: 2rem
+    @include noselect
+
+svg
+    @include noselect
+
+table
+    color: $main-font-color !important
+    
+    th
+        @include noselect
+
+a
+    color: $main-font-color
+
+    &:hover
+        color: $background-color-content

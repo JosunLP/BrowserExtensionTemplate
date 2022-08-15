@@ -1,0 +1,23 @@
+{
+    "AppData": {
+        "id": "browser_extension_template",
+        "name": "Browser Extension Template",
+        "version": "0.0.1",
+        "description": "A basic template based on SASS and TypeScript to create browser extensions without directly relying on a larger framework.",
+        "repository": {
+            "type": "git",
+            "url": "git+ssh://git@github.com:JosunLP/BrowserExtensionTemplate.git"
+        },
+        "license": "MIT",
+        "homepage": "https://github.com/JosunLP/BrowserExtensionTemplate",
+        "bugs": {
+            "url": "https://github.com/JosunLP/BrowserExtensionTemplate/issues"
+        },
+        "authors": [
+            {
+                "name": "Jonas Pfalzgraf",
+                "email": "info@josunlp.de"
+            }
+        ]
+    }
+}
