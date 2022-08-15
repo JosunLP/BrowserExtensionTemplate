@@ -689,3 +689,4 @@ dist
 
 tools/syncConfig.js
 tools/deploy.js
+tools/v2.js

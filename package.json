@@ -2,14 +2,16 @@
   "name": "browser_extension_template",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
   "scripts": {
-    "deploy": "tsc ./tools/deploy.ts --target esnext --module esnext && node ./tools/deploy.js && npm run build-js && npm run build-css",
+    "deploy-v3": "npm run build-tooling && npm run sync && node ./tools/deploy.js && npm run build-js && npm run build-css",
+    "deploy-v2": "npm run deploy-v3 && node ./tools/v2.js",
     "build-js": "tsc -p tsconfig.json",
     "build-css": "sass ./src/sass/:./dist/css/",
-    "sync": "tsc ./tools/syncConfig.ts --target esnext --module esnext && node ./tools/syncConfig.js"
+    "build-tooling": "tsc ./tools/v2.ts --target esnext --module esnext && tsc ./tools/syncConfig.ts --target esnext --module esnext && tsc ./tools/deploy.ts --target esnext --module esnext",
+    "sync": "npm run build-tooling && node ./tools/syncConfig.js"
   },
   "devDependencies": {
-    "@types/bootstrap": "^5.1.6",
     "@types/node": "^18.7.4",
     "sass": "^1.39.0",
     "typescript": "^4.2.4"
@@ -20,7 +22,22 @@
     "not dead"
   ],
   "dependencies": {
-    "bootstrap": "^5.2.0",
     "friendly-helper": "^1.7.1"
+  },
+  "authors": [
+    {
+      "name": "Jonas Pfalzgraf",
+      "email": "info@josunlp.de"
+    }
+  ],
+  "description": "A basic template based on SASS and TypeScript to create browser extensions without directly relying on a larger framework.",
+  "homepage": "https://github.com/JosunLP/BrowserExtensionTemplate",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com:JosunLP/BrowserExtensionTemplate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JosunLP/BrowserExtensionTemplate/issues"
   }
 }

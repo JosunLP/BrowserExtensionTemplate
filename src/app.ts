@@ -13,8 +13,8 @@ class App {
 
     async drawData(): Promise<void> {
         const contentRoot = <HTMLDivElement>document.getElementById(App.contentEntry)
-        const body = new HTMLDivElement()
-        const title = new HTMLHeadingElement()
+        const body = document.createElement("div")
+        const title = document.createElement("h1")
         title.innerText = "Hello World"
         body.appendChild(title)
         contentRoot.appendChild(body)
