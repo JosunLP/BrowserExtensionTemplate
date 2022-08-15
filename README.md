@@ -4,7 +4,7 @@
 [![GitHub forks](https://img.shields.io/github/forks/JosunLP/BrowserExtensionTemplate?style=for-the-badge)](https://github.com/JosunLP/BrowserExtensionTemplate/network)
 [![GitHub stars](https://img.shields.io/github/stars/JosunLP/BrowserExtensionTemplate?style=for-the-badge)](https://github.com/JosunLP/BrowserExtensionTemplate/stargazers)
 [![GitHub license](https://img.shields.io/github/license/JosunLP/BrowserExtensionTemplate?style=for-the-badge)](https://github.com/JosunLP/BrowserExtensionTemplate)
-[![Twitter](https://img.shields.io/twitter/url?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2FJosunLP%2FBrowserExtensionTemplate)
+![Twitter URL](https://img.shields.io/twitter/url?color=blue&logo=Twitter&style=for-the-badge&url=https%3A%2F%2Fgithub.com%2FJosunLP%2FBrowserExtensionTemplate)
 
 A basic template based on SASS and TypeScript to create browser extensions without directly relying on a larger framework.
 
