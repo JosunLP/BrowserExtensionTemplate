@@ -6,7 +6,7 @@ var DEPLOY_TARGET = "./dist/";
 
 function deleteFolderRecursive(path: string) {
   if (fs.existsSync(path)) {
-    fs.readdirSync(path).forEach(function(file: string) {
+    fs.readdirSync(path).forEach(function (file: string) {
       var curPath = path + "/" + file;
       if (fs.lstatSync(curPath).isDirectory()) {
         deleteFolderRecursive(curPath);
@@ -21,7 +21,7 @@ function deleteFolderRecursive(path: string) {
 function findHtmlFilesRecursive(source: string): string[] {
   var files: string[] = [];
   var dir = fs.readdirSync(source);
-  dir.forEach(function(file: any) {
+  dir.forEach(function (file: any) {
     var sourceFile = path.join(source, file);
     var stat = fs.lstatSync(sourceFile);
     if (stat.isDirectory()) {
@@ -35,33 +35,35 @@ function findHtmlFilesRecursive(source: string): string[] {
   return files;
 }
 
-function replaceKeywordsInHtmlFile(file: string, keywords: string[], values: string[]) {
+function replaceKeywordsInHtmlFile(file: string) {
   var content = fs.readFileSync(file, 'utf8');
-  for (var i = 0; i < keywords.length; i++) {
-    content = content.replace(new RegExp(keywords[i], 'g'), values[i]);
-  }
+  let pairs = appConfig.htmlTemplatePairs;
+  pairs.forEach(function (pair: any) {
+    // @ts-ignore
+    content = content.replaceAll(pair.key, pair.value);
+  });
   file = file.replace("public\\", DEPLOY_TARGET);
   fs.writeFileSync(file, content);
 }
 
-function buildHtmlFiles(source: string, keywords: string[], values: string[]) {
-  var files = findHtmlFilesRecursive(source);
-  files.forEach(function(file: string) {
-    replaceKeywordsInHtmlFile(file, keywords, values);
+function buildHtmlFiles(source: string) {
+  let files = findHtmlFilesRecursive(source);
+  files.forEach(function (file: string) {
+    replaceKeywordsInHtmlFile(file);
   });
 }
 
 function mkdirSync(path: string) {
   try {
     fs.mkdirSync(path);
-  } catch(e: any) {
-    if ( e.code != 'EEXIST' ) throw e;
+  } catch (e: any) {
+    if (e.code != 'EEXIST') throw e;
   }
 }
 
 function copyFiles(source: string, target: string) {
   var files = fs.readdirSync(source);
-  files.forEach(function(file: any) {
+  files.forEach(function (file: any) {
     var sourceFile = path.join(source, file);
     var targetFile = path.join(target, file);
     var stat = fs.lstatSync(sourceFile);
@@ -77,6 +79,6 @@ function copyFiles(source: string, target: string) {
 deleteFolderRecursive(DEPLOY_TARGET);
 mkdirSync(DEPLOY_TARGET);
 copyFiles(DEPLOY_ENTRY, DEPLOY_TARGET);
-buildHtmlFiles(DEPLOY_ENTRY, ["{{BET}}"], [appConfig.AppData.name]);
+buildHtmlFiles(DEPLOY_ENTRY);
 
 console.log("Deployed to " + DEPLOY_TARGET);

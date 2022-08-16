@@ -19,5 +19,11 @@
                 "email": "info@josunlp.de"
             }
         ]
-    }
+    },
+    "htmlTemplatePairs": [
+        {
+            "key": "{{BET}}",
+            "value": "Browser Extension Template"
+        }
+    ]
 }
