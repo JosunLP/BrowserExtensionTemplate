@@ -1,13 +1,14 @@
+import { ExecException } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 const appConfig = JSON.parse(fs.readFileSync('./app.config.json', 'utf8'));
-var DEPLOY_ENTRY = "./public/";
-var DEPLOY_TARGET = "./dist/";
+const DEPLOY_ENTRY = "./public/";
+const DEPLOY_TARGET = "./dist/";
 
 function deleteFolderRecursive(path: string) {
   if (fs.existsSync(path)) {
     fs.readdirSync(path).forEach(function (file: string) {
-      var curPath = path + "/" + file;
+      const curPath = path + "/" + file;
       if (fs.lstatSync(curPath).isDirectory()) {
         deleteFolderRecursive(curPath);
       } else {
@@ -19,11 +20,11 @@ function deleteFolderRecursive(path: string) {
 }
 
 function findHtmlFilesRecursive(source: string): string[] {
-  var files: string[] = [];
-  var dir = fs.readdirSync(source);
-  dir.forEach(function (file: any) {
-    var sourceFile = path.join(source, file);
-    var stat = fs.lstatSync(sourceFile);
+  let files: string[] = [];
+  const dir = fs.readdirSync(source);
+  dir.forEach(function (file: string) {
+    const sourceFile = path.join(source, file);
+    const stat = fs.lstatSync(sourceFile);
     if (stat.isDirectory()) {
       files = files.concat(findHtmlFilesRecursive(sourceFile));
     } else {
@@ -36,9 +37,9 @@ function findHtmlFilesRecursive(source: string): string[] {
 }
 
 function replaceKeywordsInHtmlFile(file: string) {
-  var content = fs.readFileSync(file, 'utf8');
+  const content = fs.readFileSync(file, 'utf8');
   let pairs = appConfig.htmlTemplatePairs;
-  pairs.forEach(function (pair: any) {
+  pairs.forEach(function (pair: object) {
     // @ts-ignore
     content = content.replaceAll(pair.key, pair.value);
   });
@@ -62,11 +63,11 @@ function mkdirSync(path: string) {
 }
 
 function copyFiles(source: string, target: string) {
-  var files = fs.readdirSync(source);
-  files.forEach(function (file: any) {
-    var sourceFile = path.join(source, file);
-    var targetFile = path.join(target, file);
-    var stat = fs.lstatSync(sourceFile);
+  const files = fs.readdirSync(source);
+  files.forEach(function (file: string) {
+    const sourceFile = path.join(source, file);
+    const targetFile = path.join(target, file);
+    const stat = fs.lstatSync(sourceFile);
     if (stat.isDirectory()) {
       mkdirSync(targetFile);
       copyFiles(sourceFile, targetFile);

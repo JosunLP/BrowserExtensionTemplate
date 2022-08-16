@@ -5,6 +5,8 @@
 [![GitHub stars](https://img.shields.io/github/stars/JosunLP/BrowserExtensionTemplate?style=for-the-badge)](https://github.com/JosunLP/BrowserExtensionTemplate/stargazers)
 [![GitHub license](https://img.shields.io/github/license/JosunLP/BrowserExtensionTemplate?style=for-the-badge)](https://github.com/JosunLP/BrowserExtensionTemplate)
 [![Twitter URL](https://img.shields.io/twitter/url?logo=twitter&style=for-the-badge&url=https%3A%2F%2Fgithub.com%2FJosunLP%2FBrowserExtensionTemplate)](https://twitter.com/intent/tweet?text=Look+what+i+found+on+GitHub+%23Developer%2C+%23SoftwareDeveloper%3A&url=https%3A%2F%2Fgithub.com%2FJosunLP%2FBrowserExtensionTemplate)
+[![CodeFactor](https://www.codefactor.io/repository/github/josunlp/browserextensiontemplate/badge?style=for-the-badge)](https://www.codefactor.io/repository/github/josunlp/browserextensiontemplate)
+[![Known Vulnerabilities](https://snyk.io/test/github/JosunLP/BrowserExtensionTemplate/badge.svg?style=for-the-badge)](https://snyk.io/test/github/JosunLP/BrowserExtensionTemplate)
 
 ## Description
 
