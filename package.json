@@ -23,9 +23,6 @@
     "last 2 versions",
     "not dead"
   ],
-  "dependencies": {
-    "friendly-helper": "^1.7.1"
-  },
   "authors": [
     {
       "name": "Jonas Pfalzgraf",
