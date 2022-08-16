@@ -1,4 +1,3 @@
-import { ExecException } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 const appConfig = JSON.parse(fs.readFileSync('./app.config.json', 'utf8'));
@@ -48,7 +47,7 @@ function replaceKeywordsInHtmlFile(file: string) {
 }
 
 function buildHtmlFiles(source: string) {
-  let files = findHtmlFilesRecursive(source);
+  const files = findHtmlFilesRecursive(source);
   files.forEach(function (file: string) {
     replaceKeywordsInHtmlFile(file);
   });
