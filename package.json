@@ -8,7 +8,9 @@
     "deploy-v2": "npm run deploy-v3 && node ./tools/v2.js",
     "build-js": "tsc -p tsconfig.json",
     "build-css": "sass ./src/sass/:./dist/css/",
-    "build-tooling": "tsc ./tools/v2.ts --target esnext --module esnext && tsc ./tools/syncConfig.ts --target esnext --module esnext && tsc ./tools/deploy.ts --target esnext --module esnext",
+    "build-tooling": "tsc ./tools/v2.ts --target esnext --module esnext --lib ESNext && tsc ./tools/syncConfig.ts --target esnext --module esnext --lib ESNext && tsc ./tools/deploy.ts --target esnext --module esnext --lib ESNext",
+    "watch-ts": "tsc -w -p tsconfig.json",
+    "watch-sass": "sass --watch ./src/sass/:./dist/css/",
     "sync": "npm run build-tooling && node ./tools/syncConfig.js"
   },
   "devDependencies": {
