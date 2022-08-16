@@ -37,7 +37,7 @@ function findHtmlFilesRecursive(source: string): string[] {
 
 function replaceKeywordsInHtmlFile(file: string) {
   const content = fs.readFileSync(file, 'utf8');
-  let pairs = appConfig.htmlTemplatePairs;
+  const pairs = appConfig.htmlTemplatePairs;
   pairs.forEach(function (pair: object) {
     // @ts-ignore
     content = content.replaceAll(pair.key, pair.value);
