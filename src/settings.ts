@@ -1,4 +1,5 @@
-import { Session } from "./session.js";
+import { Session } from "./classes/session.js";
+import { BasicButton } from "./components/button.js";
 
 class Settings {
 
@@ -10,13 +11,15 @@ class Settings {
 
     private async renderSettings(): Promise<void> {
         const settings = <HTMLDivElement>document.getElementById('settings');
+		const saveButton = new BasicButton('success', 'Save', 'saveSettings').render();
         settings.innerHTML = `
             <div class="form-group">
-                <label for="contentTest">Content Test</label>
-                <input type="text" class="form-control" id="contentTest" placeholder="Enter content test" value="${this.session.contentTest}">
+                <input type="text" class="form-control text-input" id="contentTest" placeholder="Enter content test" value="${this.session.contentTest}">
+				<label for="contentTest">Content Test</label>
             </div>
-            <button type="button" class="btn btn-primary" id="saveSettings">Save</button>
         `;
+		settings.innerHTML += saveButton;
+
         const saveSettings = <HTMLButtonElement>document.getElementById('saveSettings');
         saveSettings.addEventListener('click', () => {
             this.session.contentTest = (<HTMLInputElement>document.getElementById('contentTest')).value;
