@@ -1,0 +1,36 @@
+@import 'root'
+
+.text-input
+  width: 80%
+  height: 2rem
+  border: none
+  border-radius: 0.5rem
+  padding: 0.5rem
+  margin-bottom: 0.5rem
+  font-size: 1rem
+  font-family: 'Roboto', sans-serif
+  color: $seccondary-color
+  background-color: $background-color-content
+  &:focus
+    outline: none
+    background-color: $background-color-content-focus
+    color: $seccondary-color
+    box-shadow: 0px 0px 30px silver
+  &:disabled
+    background-color: $background-color-content-disabled
+    color: $seccondary-color-disabled
+    box-shadow: none
+  &:hover
+    background-color: $background-color-content-hover
+    color: $seccondary-color-hover
+    box-shadow: 0px 0px 30px silver
+  &:active
+    background-color: $background-color-content-active
+    color: $seccondary-color-active
+    box-shadow: 0px 0px 30px silver
+
+label
+  font-size: 1rem
+  font-family: 'Roboto', sans-serif
+  color: $main-font-color
+  margin-bottom: 0.5rem
