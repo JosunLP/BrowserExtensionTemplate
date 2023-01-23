@@ -1,5 +1,5 @@
-import { Session } from "./classes/session.js";
-import { BasicButton } from "./components/button.js";
+import { Session } from "./classes/session";
+import { BasicButton } from "./components/button";
 
 class Settings {
 

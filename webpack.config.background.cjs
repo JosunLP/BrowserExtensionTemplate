@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-	entry: './src/app.ts',
+	entry: './src/background.ts',
 	mode: 'production',
 	devtool: 'source-map',
 	module: {
