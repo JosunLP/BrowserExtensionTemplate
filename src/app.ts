@@ -1,4 +1,4 @@
-import { Session } from "./classes/session.js"
+import { Session } from "./classes/session"
 
 class App {
 
