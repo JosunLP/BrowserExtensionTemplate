@@ -14,8 +14,8 @@ class Settings {
 		const saveButton = new BasicButton('success', 'Save', 'saveSettings').render();
         settings.innerHTML = `
             <div class="form-group">
-                <input type="text" class="form-control text-input" id="contentTest" placeholder="Enter content test" value="${this.session.contentTest}">
 				<label for="contentTest">Content Test</label>
+                <input type="text" class="form-control text-input" id="contentTest" placeholder="Enter content test" value="${this.session.contentTest}">
             </div>
         `;
 		settings.innerHTML += saveButton;
