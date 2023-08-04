@@ -1,8 +1,9 @@
-import * as fs from 'fs';
+// @ts-ignore
+const fs = require('fs');
 
 const appConfig = JSON.parse(fs.readFileSync('./app.config.json', 'utf8'));
 const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
-const manifest = JSON.parse(fs.readFileSync('./public/manifest.json', 'utf8'));
+const manifestJson = JSON.parse(fs.readFileSync('./public/manifest.json', 'utf8'));
 
 pkg.version = appConfig.AppData.version;
 pkg.name = appConfig.AppData.id;
@@ -13,10 +14,10 @@ pkg.license = appConfig.AppData.license;
 pkg.repository = appConfig.AppData.repository;
 pkg.bugs = appConfig.AppData.bugs;
 
-manifest.version = appConfig.AppData.version;
-manifest.name = appConfig.AppData.name;
-manifest.description = appConfig.AppData.description;
-manifest.homepage_url = appConfig.AppData.homepage;
+manifestJson.version = appConfig.AppData.version;
+manifestJson.name = appConfig.AppData.name;
+manifestJson.description = appConfig.AppData.description;
+manifestJson.homepage_url = appConfig.AppData.homepage;
 
 fs.writeFileSync('./package.json', JSON.stringify(pkg, null, 2));
-fs.writeFileSync('./public/manifest.json', JSON.stringify(manifest, null, 2));
+fs.writeFileSync('./public/manifest.json', JSON.stringify(manifestJson, null, 2));
