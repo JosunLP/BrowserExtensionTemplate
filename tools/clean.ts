@@ -1,4 +1,5 @@
-import * as fs from "fs";
+// @ts-ignore
+const fs = require("fs");
 
 function removeExport(file: string) {
 	let content = fs.readFileSync(file, "utf8");

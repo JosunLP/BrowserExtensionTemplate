@@ -1,6 +1,8 @@
-import * as fs from 'fs';
-import * as path from 'path';
-const appConfig = JSON.parse(fs.readFileSync('./app.config.json', 'utf8'));
+const path = require('path');
+// @ts-ignore
+const fs = require('fs');
+
+const appConfigJson = JSON.parse(fs.readFileSync('./app.config.json', 'utf8'));
 const DEPLOY_ENTRY = "./public/";
 const DEPLOY_TARGET = "./dist/";
 
@@ -37,7 +39,7 @@ function findHtmlFilesRecursive(source: string): string[] {
 
 function replaceKeywordsInHtmlFile(file: string) {
   let content = fs.readFileSync(file, 'utf8');
-  const pairs = appConfig.htmlTemplatePairs;
+  const pairs = appConfigJson.htmlTemplatePairs;
   pairs.forEach(function (pair: object) {
     // @ts-ignore
     content = content.replaceAll(pair.key, pair.value);

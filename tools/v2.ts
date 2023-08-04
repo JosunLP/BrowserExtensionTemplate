@@ -1,4 +1,5 @@
-import * as fs from 'fs';
+// @ts-ignore
+const fs = require('fs');
 
 const manifest = JSON.parse(fs.readFileSync('./dist/manifest.json', 'utf8'));
 
