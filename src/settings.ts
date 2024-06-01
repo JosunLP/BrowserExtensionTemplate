@@ -1,5 +1,6 @@
 import { Session } from "./classes/session";
 import { BasicButton } from "./components/button";
+import "./sass/app.sass";
 
 class Settings {
 

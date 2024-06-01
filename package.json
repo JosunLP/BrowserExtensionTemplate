@@ -4,10 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "deploy-v3": "npm run build-tooling && node ./tools/deploy.js && npm run sync && npm run build-js && npm run build-css && node ./tools/clean.js",
+    "deploy-v3": "npx rimraf ./dist/ && npm run build-tooling && npm run sync && npm run build && node ./tools/parse.js",
     "deploy-v2": "npm run deploy-v3 && node ./tools/v2.js",
-    "build-js": "vite build --config ./vite.config.js && vite build --config ./vite.config.settings.js && vite build --config ./vite.config.background.js",
-    "build-css": "sass ./src/sass/:./dist/css/",
+    "build": "vite build",
     "build-tooling": "tsc --project ./tooling.tsconfig.json",
     "watch-ts": "tsc -w -p tsconfig.json",
     "watch-sass": "sass --watch ./src/sass/:./dist/css/",

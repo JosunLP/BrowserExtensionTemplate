@@ -688,7 +688,7 @@ FodyWeavers.xsd
 dist
 
 tools/syncConfig.js
-tools/deploy.js
+tools/parse.js
 tools/v2.js
 tools/clean.js
 package-lock.json
