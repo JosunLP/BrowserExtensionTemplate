@@ -7,8 +7,7 @@
     "deploy-v2": "npm run deploy-v3 && node ./tools/v2.js",
     "build": "vite build",
     "build-tooling": "tsc --project ./tooling.tsconfig.json",
-    "watch-ts": "tsc -w -p tsconfig.json",
-    "watch-sass": "sass --watch ./src/sass/:./dist/css/",
+    "watch": "vite build --watch",
     "sync": "npm run build-tooling && node ./tools/syncConfig.js"
   },
   "devDependencies": {
