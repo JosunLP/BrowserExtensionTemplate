@@ -1,12 +1,9 @@
 class Background {
+	constructor() {
+		this.main();
+	}
 
-    constructor() {
-        this.main();
-    }
-
-    async main(): Promise<void> {
-
-    }
+	async main(): Promise<void> {}
 }
 
 new Background();

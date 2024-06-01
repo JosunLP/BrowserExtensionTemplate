@@ -1,4 +1,5 @@
 import { Session } from "./classes/session"
+import "./sass/app.sass"
 
 class App {
 

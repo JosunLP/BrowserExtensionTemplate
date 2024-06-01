@@ -3,25 +3,21 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "deploy-v3": "npx rimraf ./dist/ && npm run build-tooling && node ./tools/deploy.js && npm run sync && npm run build-js && npm run build-css && node ./tools/clean.js",
-    "deploy-v2": " npm run deploy-v3 && node ./tools/v2.js",
-    "build-js": "webpack --config ./webpack.config.ts && webpack --config ./webpack.config.settings.ts && webpack --config ./webpack.config.background.ts",
-    "build-css": "sass ./src/sass/:./dist/css/",
+    "deploy-v3": "npx rimraf ./dist/ && npm run build-tooling && npm run sync && npm run build && node ./tools/parse.js",
+    "deploy-v2": "npm run deploy-v3 && node ./tools/v2.js",
+    "build": "vite build",
     "build-tooling": "tsc --project ./tooling.tsconfig.json",
     "watch-ts": "tsc -w -p tsconfig.json",
     "watch-sass": "sass --watch ./src/sass/:./dist/css/",
     "sync": "npm run build-tooling && node ./tools/syncConfig.js"
   },
   "devDependencies": {
-    "@types/chrome": "^0.0.206",
-    "@types/node": "^18.11.18",
-    "@webcomponents/webcomponentsjs": "^2.7.0",
-    "sass": "^1.39.0",
-    "ts-loader": "^9.4.2",
-    "ts-node": "^10.9.1",
-    "typescript": "^4.2.4",
-    "webpack": "^5.75.0",
-    "webpack-cli": "^5.0.1"
+    "@types/chrome": "^0.0.268",
+    "@types/node": "^20.13.0",
+    "@webcomponents/webcomponentsjs": "^2.8.0",
+    "sass": "^1.77.4",
+    "vite": "^5.2.12",
+    "vite-tsconfig-paths": "^4.3.2"
   },
   "browserslist": [
     "> 1%",
@@ -45,7 +41,7 @@
     "url": "https://github.com/JosunLP/BrowserExtensionTemplate/issues"
   },
   "dependencies": {
-    "@webcomponents/custom-elements": "^1.5.1",
-    "bootstrap": "^5.2.3"
+    "@webcomponents/custom-elements": "^1.6.0",
+    "bootstrap": "^5.3.3"
   }
 }
