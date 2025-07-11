@@ -1,31 +1,60 @@
-import { Session } from "./classes/session"
-import "./sass/app.sass"
+import { Session } from './classes/session';
+import './sass/app.sass';
 
 class App {
+  private static readonly CONTENT_ENTRY = 'content';
+  private session: Session | null = null;
 
-    private static contentEntry: string = "content"
+  constructor() {
+    this.init();
+  }
 
-    constructor() {
-        this.drawData()
-        this.main()
+  private async init(): Promise<void> {
+    try {
+      this.session = await Session.getInstance();
+      await this.drawData();
+      await this.main();
+    } catch (error) {
+      console.error('Failed to initialize app:', error);
+      this.handleError('Failed to initialize application');
+    }
+  }
+
+  private async main(): Promise<void> {
+    console.log('Hello World');
+  }
+
+  private async drawData(): Promise<void> {
+    if (!this.session) {
+      throw new Error('Session not initialized');
     }
 
-    async main(): Promise<void> {
-        console.log("Hello World")
+    const contentRoot = document.getElementById(App.CONTENT_ENTRY) as HTMLDivElement | null;
+    if (!contentRoot) {
+      throw new Error(`Element with id '${App.CONTENT_ENTRY}' not found`);
     }
 
-    async drawData(): Promise<void> {
-        const session = Session.getInstance()
-        const contentRoot = <HTMLDivElement>document.getElementById(App.contentEntry)
-        const body = document.createElement("div")
-        const title = document.createElement("h1")
-        const text = document.createElement("p")
-        title.innerText = "Hello World"
-        text.innerText = session.contentTest
-        body.appendChild(title)
-        body.appendChild(text)
-        contentRoot.appendChild(body)
+    const body = document.createElement('div');
+    body.className = 'app-content';
+
+    const title = document.createElement('h1');
+    title.innerText = 'Hello World';
+
+    const text = document.createElement('p');
+    text.innerText = this.session.contentTest;
+
+    body.appendChild(title);
+    body.appendChild(text);
+    contentRoot.appendChild(body);
+  }
+
+  private handleError(message: string): void {
+    console.error(message);
+    const contentRoot = document.getElementById(App.CONTENT_ENTRY);
+    if (contentRoot) {
+      contentRoot.innerHTML = `<div class="error-message">${message}</div>`;
     }
+  }
 }
 
 new App();

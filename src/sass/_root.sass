@@ -1,26 +1,64 @@
-$main-font: 'Ubuntu', 'Staatliches'
-$main-font-color: white
-$main-font-color-hover: lightgrey
-$main-font-color-focus: lightgrey
-$main-font-color-disabled: lightgrey
-$main-font-color-active: lightgrey
-$main-uschrift-font: 'Ubuntu', Arial
-$primary-color: #007bff
-$primary-color-hover: #0069d9
-$primary-color-focus: #0062cc
-$primary-color-disabled: #0069d9
-$primary-color-active: #0062cc
-$background-color-content-shadow: #0069d9
-$seccond-color: #6c757d
-$seccondary-color: darkgrey
-$seccondary-color-hover: black
-$seccondary-color-focus: black
-$seccondary-color-disabled: black
-$seccondary-color-active: black
-$background-color: #77B2FF
-$background-color-content: rgb(198, 223, 255)
-$background-color-content-hover: rgb(198, 223, 255)
-$background-color-content-focus: rgb(198, 223, 255)
-$background-color-content-active: rgb(198, 223, 255)
-$background-color-content-disabled: rgb(198, 223, 255)
-$logo-image: url('../icons/icon128.png')
+// CSS Custom Properties for theming support
+:root
+  --main-font: 'Ubuntu', 'Segoe UI', 'Roboto', sans-serif
+  --main-font-color: #ffffff
+  --main-font-color-hover: #f8f9fa
+  --main-font-color-focus: #e9ecef
+  --main-font-color-disabled: #6c757d
+  --main-font-color-active: #f8f9fa
+
+  --primary-color: #007bff
+  --primary-color-hover: #0056b3
+  --primary-color-focus: #004085
+  --primary-color-disabled: #6c757d
+  --primary-color-active: #004085
+
+  --secondary-color: #6c757d
+  --secondary-color-hover: #545b62
+  --secondary-color-focus: #4e555b
+  --secondary-color-disabled: #adb5bd
+  --secondary-color-active: #4e555b
+
+  --background-color: #77B2FF
+  --background-color-content: #c6dfff
+  --background-color-content-hover: #b3d7ff
+  --background-color-content-focus: #9fcdff
+  --background-color-content-active: #8cc4ff
+  --background-color-content-disabled: #e9ecef
+
+  --shadow-color: rgba(0, 0, 0, 0.1)
+  --border-radius: 0.375rem
+  --transition-duration: 0.15s
+  --font-size-base: 1rem
+  --line-height-base: 1.5
+
+// SASS Variables (for backwards compatibility)
+$main-font: var(--main-font)
+$main-font-color: var(--main-font-color)
+$main-font-color-hover: var(--main-font-color-hover)
+$main-font-color-focus: var(--main-font-color-focus)
+$main-font-color-disabled: var(--main-font-color-disabled)
+$main-font-color-active: var(--main-font-color-active)
+
+$primary-color: var(--primary-color)
+$primary-color-hover: var(--primary-color-hover)
+$primary-color-focus: var(--primary-color-focus)
+$primary-color-disabled: var(--primary-color-disabled)
+$primary-color-active: var(--primary-color-active)
+
+$secondary-color: var(--secondary-color)
+$secondary-color-hover: var(--secondary-color-hover)
+$secondary-color-focus: var(--secondary-color-focus)
+$secondary-color-disabled: var(--secondary-color-disabled)
+$secondary-color-active: var(--secondary-color-active)
+
+$background-color: var(--background-color)
+$background-color-content: var(--background-color-content)
+$background-color-content-hover: var(--background-color-content-hover)
+$background-color-content-focus: var(--background-color-content-focus)
+$background-color-content-active: var(--background-color-content-active)
+$background-color-content-disabled: var(--background-color-content-disabled)
+
+$shadow-color: var(--shadow-color)
+$border-radius: var(--border-radius)
+$transition-duration: var(--transition-duration)
