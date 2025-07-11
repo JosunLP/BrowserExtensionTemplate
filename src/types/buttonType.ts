@@ -1,1 +1,10 @@
-export type customButton = "neutral" | "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "light" | "dark";
+export type customButton =
+  | 'neutral'
+  | 'primary'
+  | 'secondary'
+  | 'success'
+  | 'danger'
+  | 'warning'
+  | 'info'
+  | 'light'
+  | 'dark';

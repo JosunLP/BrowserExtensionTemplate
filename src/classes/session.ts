@@ -1,55 +1,109 @@
-export class Session {
+interface SessionData {
+  sessionId: string;
+  contentTest: string;
+}
 
-    private static instance: Session;
+interface StorageService {
+  save(key: string, data: unknown): Promise<void>;
+  load<T>(key: string): Promise<T | null>;
+  remove(key: string): Promise<void>;
+}
 
-    private constructor() {
+class LocalStorageService implements StorageService {
+  async save(key: string, data: unknown): Promise<void> {
+    try {
+      localStorage.setItem(key, JSON.stringify(data));
+    } catch (error) {
+      console.error('Failed to save to localStorage:', error);
+      throw new Error('Storage operation failed');
     }
+  }
 
-    static getInstance() {
-        if (!Session.instance && !Session.load()) {
-            Session.instance = new Session();
-        }
-        if (!Session.instance && Session.load()) {
-            Session.instance = <Session>Session.load();
-        }
-        Session.save();
-        return Session.instance;
+  async load<T>(key: string): Promise<T | null> {
+    try {
+      const item = localStorage.getItem(key);
+      return item ? (JSON.parse(item) as T) : null;
+    } catch (error) {
+      console.error('Failed to load from localStorage:', error);
+      return null;
     }
+  }
 
-    public static save() {
-        localStorage.setItem('session', JSON.stringify(this.instance));
+  async remove(key: string): Promise<void> {
+    try {
+      localStorage.removeItem(key);
+    } catch (error) {
+      console.error('Failed to remove from localStorage:', error);
+      throw new Error('Storage operation failed');
     }
+  }
+}
 
-    public static load(): Session | null {
-        const session = localStorage.getItem('session');
-        if (session) {
-            const obj = <Session>JSON.parse(session);
-            const result = new Session();
-            result.contentTest = obj.contentTest;
-            return result;
-        }
-        return null;
+export class Session implements SessionData {
+  private static instance: Session | null = null;
+  private static readonly STORAGE_KEY = 'browser_extension_session';
+  private static readonly storageService: StorageService = new LocalStorageService();
+
+  public readonly sessionId: string;
+  public contentTest: string;
+
+  private constructor(data?: Partial<SessionData>) {
+    this.sessionId = data?.sessionId ?? crypto.randomUUID();
+    this.contentTest = data?.contentTest ?? 'This is a simple example of a web application';
+  }
+
+  public static async getInstance(): Promise<Session> {
+    if (!Session.instance) {
+      await Session.loadOrCreate();
     }
+    return Session.instance!;
+  }
 
-    public static reloadSession() {
-        const session = localStorage.getItem('session');
-        if (session) {
-            const obj = <Session>JSON.parse(session);
-            const result = new Session();
-            result.contentTest = obj.contentTest;
-            Session.instance = result;
-        }
+  private static async loadOrCreate(): Promise<void> {
+    try {
+      const savedData = await Session.storageService.load<SessionData>(Session.STORAGE_KEY);
+      Session.instance = new Session(savedData ?? undefined);
+      await Session.instance.save();
+    } catch (error) {
+      console.error('Failed to load session, creating new one:', error);
+      Session.instance = new Session();
+      await Session.instance.save();
     }
+  }
 
-    public static resetSession() {
-        localStorage.removeItem('session');
-        sessionStorage.removeItem('session');
-        this.instance = new Session();
-        Session.save();
-        location.reload();
+  public async save(): Promise<void> {
+    try {
+      const data: SessionData = {
+        sessionId: this.sessionId,
+        contentTest: this.contentTest,
+      };
+      await Session.storageService.save(Session.STORAGE_KEY, data);
+    } catch (error) {
+      console.error('Failed to save session:', error);
+      throw error;
     }
+  }
 
-    public readonly sessionId: string = crypto.randomUUID();
+  public static async reset(): Promise<void> {
+    try {
+      await Session.storageService.remove(Session.STORAGE_KEY);
+      Session.instance = new Session();
+      await Session.instance.save();
 
-    public contentTest: string = 'This is a simple example of a web application';
+      // Reload page only if we're in a browser environment
+      if (typeof window !== 'undefined' && window.location) {
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('Failed to reset session:', error);
+      throw error;
+    }
+  }
+
+  public toJSON(): SessionData {
+    return {
+      sessionId: this.sessionId,
+      contentTest: this.contentTest,
+    };
+  }
 }
