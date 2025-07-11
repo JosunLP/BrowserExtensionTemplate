@@ -12,7 +12,7 @@ function findCssFileNames(source: string): string[] {
     if (stat.isDirectory()) {
       files = files.concat(findCssFileNames(sourceFile));
     } else {
-      if (path.extname(sourceFile) == '.css') {
+      if (path.extname(sourceFile) === '.css') {
         files.push(file);
       }
     }
