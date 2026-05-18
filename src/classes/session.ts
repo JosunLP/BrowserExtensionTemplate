@@ -43,19 +43,21 @@ export class Session implements SessionData {
     // contains the latest snapshot at all times.
     effect(() => {
       const value = this.contentTest$.value;
-      this.enqueueWrite({
+      void this.enqueueWrite({
         sessionId: this.sessionId,
         contentTest: value,
+      }).catch(error => {
+        console.error('Failed to persist session:', error);
       });
     });
   }
 
-  private enqueueWrite(data: SessionData): void {
-    this.writeQueue = this.writeQueue
-      .then(() => Session.storageAdapter.set<SessionData>(Session.STORAGE_KEY, data))
-      .catch(error => {
-        console.error('Failed to persist session:', error);
-      });
+  private enqueueWrite(data: SessionData): Promise<void> {
+    const write = this.writeQueue
+      .catch(() => undefined)
+      .then(() => Session.storageAdapter.set<SessionData>(Session.STORAGE_KEY, data));
+    this.writeQueue = write;
+    return write;
   }
 
   /** Backwards compatible accessor for the non-reactive content value. */
@@ -86,11 +88,10 @@ export class Session implements SessionData {
 
   /** Explicit save kept for backwards compatibility with the previous API. */
   public async save(): Promise<void> {
-    this.enqueueWrite({
+    await this.enqueueWrite({
       sessionId: this.sessionId,
       contentTest: this.contentTest$.value,
     });
-    await this.writeQueue;
   }
 
   public static async reset(): Promise<void> {

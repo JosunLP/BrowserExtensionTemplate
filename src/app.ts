@@ -49,10 +49,9 @@ class App {
     // re-query the DOM on every signal update.
     const contentTest = $('#bet-content-test');
 
-    // Reactively mirror the session's content into the DOM. The `effect`
-    // re-runs automatically whenever `session.contentTest$` changes, so any
-    // update from the Settings page is reflected here in real time without
-    // additional plumbing.
+    // Reactively mirror this popup's in-memory session signal into the DOM.
+    // This keeps the UI in sync with updates made through the same Session
+    // instance, but it does not add cross-page storage synchronization.
     effect(() => {
       contentTest.text(session.contentTest$.value);
     });
