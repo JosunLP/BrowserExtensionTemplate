@@ -45,6 +45,10 @@ function resolveBootstrapClass(type: customButton): string {
   return BOOTSTRAP_CLASS_MAP[type] ?? BOOTSTRAP_CLASS_MAP.primary;
 }
 
+function splitClassNames(value: string): string[] {
+  return value.split(/\s+/).filter(Boolean);
+}
+
 let registered = false;
 
 /**
@@ -130,18 +134,21 @@ export class BasicButton {
 
     $button.attr('type', 'button');
     $button.text(this.config.text);
-    $button.addClass(...resolveBootstrapClass(this.config.type).split(/\s+/).filter(Boolean));
+    $button.addClass(...splitClassNames(resolveBootstrapClass(this.config.type)));
 
     if (this.config.id) {
       $button.attr('id', this.config.id);
     }
 
     if (this.config.className) {
-      $button.addClass(...this.config.className.split(/\s+/).filter(Boolean));
+      $button.addClass(...splitClassNames(this.config.className));
     }
 
     if (this.config.disabled) {
-      $button.attr('disabled', 'true');
+      // Use the DOM property so the button reflects the disabled state via
+      // its `HTMLButtonElement.disabled` flag, matching browser semantics
+      // rather than relying on attribute string coercion.
+      button.disabled = true;
     }
 
     if (this.config.onClick) {
