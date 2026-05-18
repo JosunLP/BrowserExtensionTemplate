@@ -1,8 +1,9 @@
-import { $ } from '@bquery/bquery/core';
+import { safeHtml } from '@bquery/bquery/component';
+import { $, sleep } from '@bquery/bquery/core';
 import { createForm, required } from '@bquery/bquery/forms';
 import { useAnnouncer } from '@bquery/bquery/platform';
 import { effect } from '@bquery/bquery/reactive';
-import { escapeHtml, sanitizeHtml } from '@bquery/bquery/security';
+import { sanitizeHtml } from '@bquery/bquery/security';
 import { Session } from './classes/session';
 import { registerBetButton } from './components/button';
 import './sass/app.sass';
@@ -64,10 +65,11 @@ class Settings {
     const announcer = useAnnouncer({ politeness: 'polite' });
 
     // Render the form scaffold using the new bQuery web component button.
-    // `safeHtml`-style sanitization is provided implicitly through the
-    // component pipeline; user-supplied content is HTML-escaped here.
+    // The form scaffold is built through `safeHtml` so every interpolated
+    // value is HTML-escaped at the template level without manual calls to
+    // `escapeHtml`.
     root.empty().append(
-      `<form id="bet-settings-form" novalidate>
+      safeHtml`<form id="bet-settings-form" novalidate>
         <div class="form-group">
           <label for="contentTest">Content Test</label>
           <input
@@ -75,7 +77,7 @@ class Settings {
             class="form-control text-input"
             id="contentTest"
             placeholder="Enter content test"
-            value="${escapeHtml(session.contentTest$.value)}"
+            value="${session.contentTest$.value}"
             aria-describedby="contentTest-error"
             autocomplete="off"
           />
@@ -145,34 +147,33 @@ class Settings {
   }
 
   private showNotification(message: string, type: 'success' | 'error'): void {
-    const safeMessage = escapeHtml(message);
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.innerHTML = safeMessage;
-    notification.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 10px 20px;
-      border-radius: 4px;
-      color: white;
-      background-color: ${type === 'success' ? '#28a745' : '#dc3545'};
-      z-index: 1000;
-    `;
+    // Everything past the initial host attach goes through bQuery: class
+    // toggles, safe text content (no `innerHTML`), inline styling, and the
+    // teardown timer (`sleep` instead of a raw `setTimeout`).
+    const host = document.body.appendChild(document.createElement('div'));
+    const $host = $(host);
+    $host.addClass('notification', `notification-${type}`);
+    $host.text(message);
+    $host.css({
+      position: 'fixed',
+      top: '20px',
+      right: '20px',
+      padding: '10px 20px',
+      'border-radius': '4px',
+      color: 'white',
+      'background-color': type === 'success' ? '#28a745' : '#dc3545',
+      'z-index': '1000',
+    });
 
-    document.body.appendChild(notification);
-
-    setTimeout(() => {
-      if (notification.parentNode) {
-        notification.parentNode.removeChild(notification);
-      }
-    }, 3000);
+    void sleep(3000).then(() => {
+      $host.remove();
+    });
   }
 
   private handleError(message: string): void {
     console.error(message);
     if (document.getElementById('settings')) {
-      $('#settings').html(`<div class="error-message">${escapeHtml(message)}</div>`);
+      $('#settings').html(safeHtml`<div class="error-message">${message}</div>`);
     }
   }
 }

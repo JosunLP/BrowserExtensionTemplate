@@ -9,8 +9,11 @@
  *
  * A thin `BasicButton` class is preserved to keep the historical imperative
  * API working for callers that still build HTML strings or HTMLButtonElements.
+ * Its internals also route through bQuery's `safeHtml` template tag and the
+ * `$`/chainable DOM API instead of raw `innerHTML` / `setAttribute` calls.
  */
 import { bool, component, safeHtml } from '@bquery/bquery/component';
+import { $ } from '@bquery/bquery/core';
 import { customButton } from '../types/buttonType';
 
 export interface ButtonConfig {
@@ -110,29 +113,39 @@ export class BasicButton {
   }
 
   public render(): string {
-    return this.createElement().outerHTML;
+    const baseClass = resolveBootstrapClass(this.config.type);
+    const extraClass = this.config.className ?? '';
+    const id = this.config.id ?? '';
+    return safeHtml`<button
+        type="button"
+        class="${`${baseClass} ${extraClass}`.trim()}"
+        ${id ? safeHtml`id="${id}"` : ''}
+        ${bool('disabled', this.config.disabled)}
+      >${this.config.text}</button>`;
   }
 
   public createElement(): HTMLButtonElement {
     const button = document.createElement('button');
-    button.type = 'button';
-    button.textContent = this.config.text;
-    button.className = resolveBootstrapClass(this.config.type);
+    const $button = $(button);
+
+    $button.attr('type', 'button');
+    $button.text(this.config.text);
+    $button.addClass(...resolveBootstrapClass(this.config.type).split(/\s+/).filter(Boolean));
 
     if (this.config.id) {
-      button.id = this.config.id;
+      $button.attr('id', this.config.id);
     }
 
     if (this.config.className) {
-      button.className += ` ${this.config.className}`;
+      $button.addClass(...this.config.className.split(/\s+/).filter(Boolean));
     }
 
     if (this.config.disabled) {
-      button.disabled = true;
+      $button.attr('disabled', 'true');
     }
 
     if (this.config.onClick) {
-      button.addEventListener('click', this.config.onClick);
+      $button.on('click', this.config.onClick);
     }
 
     return button;

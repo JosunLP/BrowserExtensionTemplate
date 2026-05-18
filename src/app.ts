@@ -1,6 +1,6 @@
+import { safeHtml } from '@bquery/bquery/component';
 import { $ } from '@bquery/bquery/core';
 import { effect } from '@bquery/bquery/reactive';
-import { escapeHtml } from '@bquery/bquery/security';
 import { Session } from './classes/session';
 import './sass/app.sass';
 
@@ -61,7 +61,7 @@ class App {
     console.error(message);
     const root = $(`#${App.CONTENT_ENTRY}`);
     if (document.getElementById(App.CONTENT_ENTRY)) {
-      root.html(`<div class="error-message">${escapeHtml(message)}</div>`);
+      root.html(safeHtml`<div class="error-message">${message}</div>`);
     }
   }
 }
