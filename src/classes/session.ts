@@ -1,55 +1,60 @@
+/**
+ * Session management built on top of the bQuery platform/storage adapter and
+ * reactive signals from `@bquery/bquery/reactive`.
+ *
+ * The session exposes its mutable fields as `Signal`s so views and components
+ * can subscribe to changes without manual polling. Persistence is handled
+ * through `@bquery/bquery/platform`'s unified `StorageAdapter` so the
+ * underlying backend (localStorage, sessionStorage, IndexedDB, …) can be
+ * swapped without touching consumers.
+ */
+import type { StorageAdapter } from '@bquery/bquery/platform';
+import { storage } from '@bquery/bquery/platform';
+import { effect, signal, type Signal } from '@bquery/bquery/reactive';
+
 interface SessionData {
   sessionId: string;
   contentTest: string;
 }
 
-interface StorageService {
-  save(key: string, data: unknown): Promise<void>;
-  load<T>(key: string): Promise<T | null>;
-  remove(key: string): Promise<void>;
-}
-
-class LocalStorageService implements StorageService {
-  async save(key: string, data: unknown): Promise<void> {
-    try {
-      localStorage.setItem(key, JSON.stringify(data));
-    } catch (error) {
-      console.error('Failed to save to localStorage:', error);
-      throw new Error('Storage operation failed');
-    }
-  }
-
-  async load<T>(key: string): Promise<T | null> {
-    try {
-      const item = localStorage.getItem(key);
-      return item ? (JSON.parse(item) as T) : null;
-    } catch (error) {
-      console.error('Failed to load from localStorage:', error);
-      return null;
-    }
-  }
-
-  async remove(key: string): Promise<void> {
-    try {
-      localStorage.removeItem(key);
-    } catch (error) {
-      console.error('Failed to remove from localStorage:', error);
-      throw new Error('Storage operation failed');
-    }
-  }
-}
-
 export class Session implements SessionData {
   private static instance: Session | null = null;
   private static readonly STORAGE_KEY = 'browser_extension_session';
-  private static readonly storageService: StorageService = new LocalStorageService();
+  private static readonly storageAdapter: StorageAdapter = storage.local();
 
   public readonly sessionId: string;
-  public contentTest: string;
+  /** Reactive signal holding the current `contentTest` value. */
+  public readonly contentTest$: Signal<string>;
 
   private constructor(data?: Partial<SessionData>) {
     this.sessionId = data?.sessionId ?? crypto.randomUUID();
-    this.contentTest = data?.contentTest ?? 'This is a simple example of a web application';
+    this.contentTest$ = signal<string>(
+      data?.contentTest ?? 'This is a simple example of a web application'
+    );
+
+    // Auto-persist whenever the reactive value changes. The first run is a
+    // no-op write of the seeded value which guarantees the storage backend
+    // contains the latest snapshot at all times.
+    effect(() => {
+      const value = this.contentTest$.value;
+      void Session.storageAdapter
+        .set<SessionData>(Session.STORAGE_KEY, {
+          sessionId: this.sessionId,
+          contentTest: value,
+        })
+        .catch(error => {
+          console.error('Failed to persist session:', error);
+        });
+    });
+  }
+
+  /** Backwards compatible accessor for the non-reactive content value. */
+  public get contentTest(): string {
+    return this.contentTest$.value;
+  }
+
+  public set contentTest(value: string) {
+    this.contentTest$.value = value;
   }
 
   public static async getInstance(): Promise<Session> {
@@ -61,23 +66,21 @@ export class Session implements SessionData {
 
   private static async loadOrCreate(): Promise<void> {
     try {
-      const savedData = await Session.storageService.load<SessionData>(Session.STORAGE_KEY);
+      const savedData = await Session.storageAdapter.get<SessionData>(Session.STORAGE_KEY);
       Session.instance = new Session(savedData ?? undefined);
-      await Session.instance.save();
     } catch (error) {
       console.error('Failed to load session, creating new one:', error);
       Session.instance = new Session();
-      await Session.instance.save();
     }
   }
 
+  /** Explicit save kept for backwards compatibility with the previous API. */
   public async save(): Promise<void> {
     try {
-      const data: SessionData = {
+      await Session.storageAdapter.set<SessionData>(Session.STORAGE_KEY, {
         sessionId: this.sessionId,
-        contentTest: this.contentTest,
-      };
-      await Session.storageService.save(Session.STORAGE_KEY, data);
+        contentTest: this.contentTest$.value,
+      });
     } catch (error) {
       console.error('Failed to save session:', error);
       throw error;
@@ -86,11 +89,10 @@ export class Session implements SessionData {
 
   public static async reset(): Promise<void> {
     try {
-      await Session.storageService.remove(Session.STORAGE_KEY);
+      await Session.storageAdapter.remove(Session.STORAGE_KEY);
       Session.instance = new Session();
       await Session.instance.save();
 
-      // Reload page only if we're in a browser environment
       if (typeof window !== 'undefined' && window.location) {
         window.location.reload();
       }
@@ -103,7 +105,7 @@ export class Session implements SessionData {
   public toJSON(): SessionData {
     return {
       sessionId: this.sessionId,
-      contentTest: this.contentTest,
+      contentTest: this.contentTest$.value,
     };
   }
 }

@@ -1,103 +1,151 @@
+import { $ } from '@bquery/bquery/core';
+import { createForm, required } from '@bquery/bquery/forms';
+import { useAnnouncer } from '@bquery/bquery/platform';
+import { effect } from '@bquery/bquery/reactive';
+import { escapeHtml, sanitizeHtml } from '@bquery/bquery/security';
 import { Session } from './classes/session';
-import { BasicButton } from './components/button';
+import { registerBetButton } from './components/button';
 import './sass/app.sass';
 
 class Settings {
   private session: Session | null = null;
 
   constructor() {
-    this.init();
+    void this.init();
   }
 
   private async init(): Promise<void> {
     try {
+      // Ensure the <bet-button> custom element is registered before any
+      // template that references it is parsed.
+      registerBetButton();
+
       this.session = await Session.getInstance();
-      await this.renderSettings();
+      this.renderSettings();
     } catch (error) {
       console.error('Failed to initialize settings:', error);
       this.handleError('Failed to load settings');
     }
   }
 
-  private async renderSettings(): Promise<void> {
-    if (!this.session) {
+  private renderSettings(): void {
+    const session = this.session;
+    if (!session) {
       throw new Error('Session not initialized');
     }
 
-    const settingsElement = document.getElementById('settings') as HTMLDivElement | null;
-    if (!settingsElement) {
+    if (!document.getElementById('settings')) {
       throw new Error('Settings element not found');
     }
+    const root = $('#settings');
 
-    const saveButton = new BasicButton('success', 'Save', 'saveSettings').render();
+    // Build a reactive form with field-level validation. The initial value
+    // is seeded from the persisted session so existing data round-trips.
+    const form = createForm<{ contentTest: string }>({
+      fields: {
+        contentTest: {
+          initialValue: session.contentTest$.value,
+          validators: [required('Content test must not be empty')],
+        },
+      },
+      onSubmit: async values => {
+        // Use sanitizeHtml in addition to escaping at render time so any
+        // markup pasted into the field is stripped before persistence. This
+        // hardens against stored-XSS even when the value is later rendered
+        // through an unsanitized sink.
+        session.contentTest = sanitizeHtml(values.contentTest);
+        await session.save();
+        announcer.announce('Settings saved successfully');
+        this.showNotification('Settings saved successfully!', 'success');
+      },
+    });
 
-    settingsElement.innerHTML = `
-            <div class="form-group">
-                <label for="contentTest">Content Test</label>
-                <input
-                    type="text"
-                    class="form-control text-input"
-                    id="contentTest"
-                    placeholder="Enter content test"
-                    value="${this.escapeHtml(this.session.contentTest)}"
-                >
-            </div>
-            ${saveButton}
-        `;
+    // Live region used to announce status updates to assistive technologies.
+    const announcer = useAnnouncer({ politeness: 'polite' });
 
-    this.attachEventListeners();
-  }
+    // Render the form scaffold using the new bQuery web component button.
+    // `safeHtml`-style sanitization is provided implicitly through the
+    // component pipeline; user-supplied content is HTML-escaped here.
+    root.empty().append(
+      `<form id="bet-settings-form" novalidate>
+        <div class="form-group">
+          <label for="contentTest">Content Test</label>
+          <input
+            type="text"
+            class="form-control text-input"
+            id="contentTest"
+            placeholder="Enter content test"
+            value="${escapeHtml(session.contentTest$.value)}"
+            autocomplete="off"
+          />
+          <small id="contentTest-error" class="form-text text-danger" role="alert"></small>
+        </div>
+        <bet-button id="saveSettings" variant="success" text="Save"></bet-button>
+      </form>`
+    );
 
-  private attachEventListeners(): void {
-    const saveButton = document.getElementById('saveSettings') as HTMLButtonElement | null;
-    const contentInput = document.getElementById('contentTest') as HTMLInputElement | null;
+    const input = $('#contentTest');
+    const errorLabel = $('#contentTest-error');
+    const submitButton = $('#saveSettings');
 
-    if (!saveButton || !contentInput) {
-      console.error('Required elements not found');
-      return;
-    }
+    // Two-way binding between the input and the reactive form field.
+    input.on('input', event => {
+      const target = event.target as HTMLInputElement | null;
+      if (target) {
+        form.fields.contentTest.value.value = target.value;
+      }
+    });
 
-    saveButton.addEventListener('click', async () => {
+    input.on('blur', () => {
+      form.fields.contentTest.touch();
+    });
+
+    // Reflect field validation state into the DOM reactively.
+    effect(() => {
+      const error = form.fields.contentTest.error.value;
+      const touched = form.fields.contentTest.isTouched.value;
+      const visibleError = touched ? error : '';
+      errorLabel.text(visibleError);
+      input.attr('aria-invalid', visibleError ? 'true' : 'false');
+    });
+
+    // Disable the submit button while submission is in flight.
+    effect(() => {
+      const submitting = form.isSubmitting.value;
+      if (submitting) {
+        submitButton.attr('disabled', 'true');
+      } else {
+        submitButton.removeAttr('disabled');
+      }
+    });
+
+    submitButton.on('click', async event => {
+      event.preventDefault();
       try {
-        await this.saveSettings(contentInput.value);
+        await form.handleSubmit();
       } catch (error) {
         console.error('Failed to save settings:', error);
+        announcer.announce('Failed to save settings', { politeness: 'assertive' });
         this.showNotification('Failed to save settings', 'error');
       }
     });
   }
 
-  private async saveSettings(contentTest: string): Promise<void> {
-    if (!this.session) {
-      throw new Error('Session not initialized');
-    }
-
-    this.session.contentTest = contentTest;
-    await this.session.save();
-    this.showNotification('Settings saved successfully!', 'success');
-  }
-
-  private escapeHtml(text: string): string {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
-
   private showNotification(message: string, type: 'success' | 'error'): void {
-    // Simple notification - could be enhanced with a proper notification system
+    const safeMessage = escapeHtml(message);
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
-    notification.textContent = message;
+    notification.innerHTML = safeMessage;
     notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            border-radius: 4px;
-            color: white;
-            background-color: ${type === 'success' ? '#28a745' : '#dc3545'};
-            z-index: 1000;
-        `;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      border-radius: 4px;
+      color: white;
+      background-color: ${type === 'success' ? '#28a745' : '#dc3545'};
+      z-index: 1000;
+    `;
 
     document.body.appendChild(notification);
 
@@ -110,9 +158,8 @@ class Settings {
 
   private handleError(message: string): void {
     console.error(message);
-    const settingsElement = document.getElementById('settings');
-    if (settingsElement) {
-      settingsElement.innerHTML = `<div class="error-message">${message}</div>`;
+    if (document.getElementById('settings')) {
+      $('#settings').html(`<div class="error-message">${escapeHtml(message)}</div>`);
     }
   }
 }

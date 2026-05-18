@@ -59,6 +59,7 @@
     "url": "https://github.com/JosunLP/BrowserExtensionTemplate/issues"
   },
   "dependencies": {
+    "@bquery/bquery": "^1.12.0",
     "@webcomponents/custom-elements": "^1.6.0",
     "bootstrap": "^5.3.3"
   }

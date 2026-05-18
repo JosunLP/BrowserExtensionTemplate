@@ -1,3 +1,6 @@
+import { $ } from '@bquery/bquery/core';
+import { effect } from '@bquery/bquery/reactive';
+import { escapeHtml } from '@bquery/bquery/security';
 import { Session } from './classes/session';
 import './sass/app.sass';
 
@@ -6,13 +9,13 @@ class App {
   private session: Session | null = null;
 
   constructor() {
-    this.init();
+    void this.init();
   }
 
   private async init(): Promise<void> {
     try {
       this.session = await Session.getInstance();
-      await this.drawData();
+      this.drawData();
       await this.main();
     } catch (error) {
       console.error('Failed to initialize app:', error);
@@ -24,35 +27,38 @@ class App {
     console.log('Hello World');
   }
 
-  private async drawData(): Promise<void> {
-    if (!this.session) {
+  private drawData(): void {
+    const session = this.session;
+    if (!session) {
       throw new Error('Session not initialized');
     }
 
-    const contentRoot = document.getElementById(App.CONTENT_ENTRY) as HTMLDivElement | null;
-    if (!contentRoot) {
+    if (!document.getElementById(App.CONTENT_ENTRY)) {
       throw new Error(`Element with id '${App.CONTENT_ENTRY}' not found`);
     }
 
-    const body = document.createElement('div');
-    body.className = 'app-content';
+    // Scaffold the static structure once using bQuery's chainable DOM API.
+    $(`#${App.CONTENT_ENTRY}`).empty().append(
+      `<div class="app-content">
+        <h1>Hello World</h1>
+        <p id="bet-content-test"></p>
+      </div>`
+    );
 
-    const title = document.createElement('h1');
-    title.innerText = 'Hello World';
-
-    const text = document.createElement('p');
-    text.innerText = this.session.contentTest;
-
-    body.appendChild(title);
-    body.appendChild(text);
-    contentRoot.appendChild(body);
+    // Reactively mirror the session's content into the DOM. The `effect`
+    // re-runs automatically whenever `session.contentTest$` changes, so any
+    // update from the Settings page is reflected here in real time without
+    // additional plumbing.
+    effect(() => {
+      $('#bet-content-test').text(session.contentTest$.value);
+    });
   }
 
   private handleError(message: string): void {
     console.error(message);
-    const contentRoot = document.getElementById(App.CONTENT_ENTRY);
-    if (contentRoot) {
-      contentRoot.innerHTML = `<div class="error-message">${message}</div>`;
+    const root = $(`#${App.CONTENT_ENTRY}`);
+    if (document.getElementById(App.CONTENT_ENTRY)) {
+      root.html(`<div class="error-message">${escapeHtml(message)}</div>`);
     }
   }
 }
