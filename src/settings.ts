@@ -50,11 +50,13 @@ class Settings {
         },
       },
       onSubmit: async values => {
-        // Use sanitizeHtml in addition to escaping at render time so any
-        // markup pasted into the field is stripped before persistence. This
-        // hardens against stored-XSS even when the value is later rendered
-        // through an unsanitized sink.
-        session.contentTest = sanitizeHtml(values.contentTest);
+        // Defense in depth: normalize stored markup before persistence, while
+        // still requiring context-appropriate escaping/sanitization at every
+        // render sink.
+        const sanitizedValue = sanitizeHtml(values.contentTest);
+        form.fields.contentTest.value.value = sanitizedValue;
+        input.val(sanitizedValue);
+        session.contentTest = sanitizedValue;
         await session.save();
         announcer.announce('Settings saved successfully');
         this.showNotification('Settings saved successfully!', 'success');
@@ -64,10 +66,9 @@ class Settings {
     // Live region used to announce status updates to assistive technologies.
     const announcer = useAnnouncer({ politeness: 'polite' });
 
-    // Render the form scaffold using the new bQuery web component button.
-    // The form scaffold is built through `safeHtml` so every interpolated
-    // value is HTML-escaped at the template level without manual calls to
-    // `escapeHtml`.
+    // Render the surrounding form scaffold with `safeHtml` so interpolated
+    // values in this template are escaped here. The nested `<bet-button>`
+    // renders its own internal markup separately.
     root.empty().append(
       safeHtml`<form id="bet-settings-form" novalidate>
         <div class="form-group">

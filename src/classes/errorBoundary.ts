@@ -6,8 +6,9 @@ export class ErrorBoundary {
 
   /**
    * Produces an HTML-escaped representation of an error message using
-   * bQuery's security primitives. Use this when surfacing error text in any
-   * DOM context to avoid XSS via attacker-controlled error messages.
+   * bQuery's security primitives. Use this when surfacing untrusted error
+   * text inside HTML text content; other sinks (for example URLs, styles, or
+   * scriptable attributes) still need context-specific validation/encoding.
    */
   public static formatErrorMessage(message: string): string {
     return escapeHtml(message);

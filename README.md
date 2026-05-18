@@ -144,7 +144,7 @@ effect(() => {
 
 // Either accessor or signal write; both persist via storage.local() automatically.
 session.contentTest = 'New value';
-session.contentTest$.value = 'New value';
+// Or: session.contentTest$.value = 'New value';
 ```
 
 ### bQuery.js Integration
@@ -168,14 +168,16 @@ What ships out of the box:
   to keep the popup in sync with the session signal.
 - **Reactive options page (`src/settings.ts`)** — uses `createForm` for
   validated form state, `useAnnouncer` for accessible status messages, and
-  `escapeHtml` / `sanitizeHtml` for every DOM write.
+  bQuery security helpers for render-time escaping plus form-time value
+  normalization before persistence.
 - **`<bet-button>` Web Component (`src/components/button.ts`)** — defined via
   `component()` with typed props (`variant`, `text`, `disabled`) and
   rendered through `safeHtml` + `bool()`.
 - **Reactive background worker (`src/background.ts`)** — tracks runtime
   state (`installReason`, `messageCount`) with signals and `computed`.
-- **Security by default** — error messages, notifications, and stored
-  content are sanitized via the bQuery security module.
+- **Security helpers included** — error rendering uses `escapeHtml`, the
+  options form normalizes persisted text with `sanitizeHtml`, and DOM writes
+  still use context-appropriate escaping/sanitization at the sink.
 
 ### Error Handling
 

@@ -22,6 +22,13 @@ export class Session implements SessionData {
   private static readonly STORAGE_KEY = 'browser_extension_session';
   private static readonly storageAdapter: StorageAdapter = storage.local();
 
+  private static isSameData(
+    left: SessionData | null | undefined,
+    right: SessionData | null | undefined
+  ): boolean {
+    return !!left && !!right && left.sessionId === right.sessionId && left.contentTest === right.contentTest;
+  }
+
   public readonly sessionId: string;
   /** Reactive signal holding the current `contentTest` value. */
   public readonly contentTest$: Signal<string>;
@@ -31,6 +38,8 @@ export class Session implements SessionData {
    * signal updates faster than the storage adapter can flush.
    */
   private writeQueue: Promise<void> = Promise.resolve();
+  private lastQueuedData: SessionData | null = null;
+  private lastQueuedWriteFailed = false;
 
   private constructor(data?: Partial<SessionData>) {
     this.sessionId = data?.sessionId ?? crypto.randomUUID();
@@ -42,22 +51,43 @@ export class Session implements SessionData {
     // no-op write of the seeded value which guarantees the storage backend
     // contains the latest snapshot at all times.
     effect(() => {
-      const value = this.contentTest$.value;
-      void this.enqueueWrite({
-        sessionId: this.sessionId,
-        contentTest: value,
-      }).catch(error => {
+      void this.enqueueWrite(this.snapshot()).catch(error => {
         console.error('Failed to persist session:', error);
       });
     });
   }
 
+  private snapshot(): SessionData {
+    return {
+      sessionId: this.sessionId,
+      contentTest: this.contentTest$.value,
+    };
+  }
+
   private enqueueWrite(data: SessionData): Promise<void> {
+    if (Session.isSameData(this.lastQueuedData, data) && !this.lastQueuedWriteFailed) {
+      return this.writeQueue;
+    }
+
+    this.lastQueuedData = data;
+    this.lastQueuedWriteFailed = false;
+
     const write = this.writeQueue
       .catch(() => undefined)
       .then(() => Session.storageAdapter.set<SessionData>(Session.STORAGE_KEY, data));
-    this.writeQueue = write;
-    return write;
+
+    this.writeQueue = write.catch(error => {
+      if (Session.isSameData(this.lastQueuedData, data)) {
+        this.lastQueuedWriteFailed = true;
+      }
+      throw error;
+    });
+
+    return this.writeQueue;
+  }
+
+  private async waitForQueuedWrites(): Promise<void> {
+    await this.writeQueue.catch(() => undefined);
   }
 
   /** Backwards compatible accessor for the non-reactive content value. */
@@ -88,14 +118,16 @@ export class Session implements SessionData {
 
   /** Explicit save kept for backwards compatibility with the previous API. */
   public async save(): Promise<void> {
-    await this.enqueueWrite({
-      sessionId: this.sessionId,
-      contentTest: this.contentTest$.value,
-    });
+    await this.enqueueWrite(this.snapshot());
   }
 
   public static async reset(): Promise<void> {
     try {
+      const previousInstance = Session.instance;
+      if (previousInstance) {
+        await previousInstance.waitForQueuedWrites();
+      }
+
       await Session.storageAdapter.remove(Session.STORAGE_KEY);
       Session.instance = new Session();
       await Session.instance.save();
@@ -110,9 +142,6 @@ export class Session implements SessionData {
   }
 
   public toJSON(): SessionData {
-    return {
-      sessionId: this.sessionId,
-      contentTest: this.contentTest$.value,
-    };
+    return this.snapshot();
   }
 }
