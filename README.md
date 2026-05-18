@@ -21,7 +21,7 @@ A modern, production-ready template for building browser extensions using TypeSc
 - 💾 **Session Management**: Reactive session powered by bQuery's `platform/storage` adapter and signals
 - 🛠️ **Build System**: Optimized Vite configuration with code splitting
 - 🎨 **Modern CSS**: CSS Custom Properties with SASS preprocessing
-- 🔒 **Security**: Content Security Policy and bQuery `escapeHtml` / `sanitizeHtml` for all DOM writes
+- 🔒 **Security**: Content Security Policy plus bQuery `safeHtml`/text sinks for DOM rendering and `sanitizeHtml` for settings persistence normalization
 - ⚡ **Error Handling**: Comprehensive error boundary system
 
 ## Installation

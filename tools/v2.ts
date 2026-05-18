@@ -21,6 +21,7 @@ interface ManifestJson {
 }
 
 const FIREFOX_BACKGROUND_BUNDLE = 'background.firefox.js';
+const DEFAULT_MV2_CONTENT_SECURITY_POLICY = "default-src 'self'";
 
 buildSync({
   entryPoints: ['./src/background.ts'],
@@ -63,16 +64,17 @@ try {
   if (typeof manifest.content_security_policy === 'string') {
     newContentSecurityPolicy = manifest.content_security_policy;
   } else if (manifest.content_security_policy && typeof manifest.content_security_policy === 'object') {
-    newContentSecurityPolicy = Object.values(manifest.content_security_policy as Record<string, string>).join(
-      ' '
-    );
+    const policyMap = manifest.content_security_policy as Record<string, unknown>;
+    if (typeof policyMap.extension_pages === 'string') {
+      newContentSecurityPolicy = policyMap.extension_pages;
+    }
   }
 } catch {
-  newContentSecurityPolicy = "default-src 'self'";
+  newContentSecurityPolicy = DEFAULT_MV2_CONTENT_SECURITY_POLICY;
 }
 
 if (!newContentSecurityPolicy) {
-  newContentSecurityPolicy = "default-src 'self'";
+  newContentSecurityPolicy = DEFAULT_MV2_CONTENT_SECURITY_POLICY;
 }
 
 manifest.content_security_policy = newContentSecurityPolicy;
@@ -81,7 +83,9 @@ try {
   const webAccessibleResources = manifest.web_accessible_resources as
     | Array<{ resources: string[] }>
     | undefined;
-  manifest.web_accessible_resources = webAccessibleResources?.[0]?.resources ?? [];
+  manifest.web_accessible_resources = [
+    ...new Set(webAccessibleResources?.flatMap(group => group.resources) ?? []),
+  ];
 } catch {
   manifest.web_accessible_resources = [];
 }
