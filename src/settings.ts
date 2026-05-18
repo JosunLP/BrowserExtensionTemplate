@@ -89,9 +89,6 @@ class Settings {
     const input = $('#contentTest');
     const errorLabel = $('#contentTest-error');
     const submitButton = $('#saveSettings');
-    const submitSettings = async (): Promise<void> => {
-      await form.handleSubmit();
-    };
 
     // Two-way binding between the input and the reactive form field.
     input.on('input', event => {
@@ -127,7 +124,7 @@ class Settings {
     formElement.on('submit', async event => {
       event.preventDefault();
       try {
-        await submitSettings();
+        await form.handleSubmit();
       } catch (error) {
         console.error('Failed to save settings:', error);
         announcer.announce('Failed to save settings', { politeness: 'assertive' });
@@ -138,7 +135,7 @@ class Settings {
     submitButton.on('click', async event => {
       event.preventDefault();
       try {
-        await submitSettings();
+        await form.handleSubmit();
       } catch (error) {
         console.error('Failed to save settings:', error);
         announcer.announce('Failed to save settings', { politeness: 'assertive' });
