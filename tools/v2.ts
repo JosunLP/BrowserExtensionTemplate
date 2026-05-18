@@ -11,6 +11,7 @@ interface ManifestJson {
     [key: string]: unknown;
   };
   permissions?: unknown[];
+  optional_permissions?: unknown[];
   host_permissions?: unknown;
   optional_host_permissions?: unknown;
   content_security_policy?: unknown;
@@ -63,8 +64,8 @@ if (manifest.host_permissions) {
 }
 
 if (manifest.optional_host_permissions) {
-  manifest.permissions ??= [];
-  manifest.permissions.push(...toPermissionList(manifest.optional_host_permissions));
+  manifest.optional_permissions ??= [];
+  manifest.optional_permissions.push(...toPermissionList(manifest.optional_host_permissions));
 }
 
 delete manifest.host_permissions;

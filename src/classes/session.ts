@@ -40,6 +40,8 @@ export class Session implements SessionData {
   private writeQueue: Promise<void> = Promise.resolve();
   private lastQueuedData: SessionData | null = null;
   private lastQueuedWriteFailed = false;
+  private isActive = true;
+  private readonly stopAutoPersist: () => void;
 
   private constructor(data?: Partial<SessionData>) {
     this.sessionId = data?.sessionId ?? crypto.randomUUID();
@@ -50,7 +52,7 @@ export class Session implements SessionData {
     // Auto-persist whenever the reactive value changes. The first run also
     // writes the seeded value, so constructing a session has an immediate
     // persistence side effect that keeps storage aligned with the snapshot.
-    effect(() => {
+    this.stopAutoPersist = effect(() => {
       void this.enqueueWrite(this.snapshot()).catch(error => {
         console.error('Failed to persist session:', error);
       });
@@ -65,6 +67,10 @@ export class Session implements SessionData {
   }
 
   private enqueueWrite(data: SessionData): Promise<void> {
+    if (!this.isActive) {
+      return Promise.reject(new Error('Session instance is no longer active.'));
+    }
+
     if (Session.isSameData(this.lastQueuedData, data) && !this.lastQueuedWriteFailed) {
       return this.writeQueue;
     }
@@ -90,6 +96,15 @@ export class Session implements SessionData {
     await this.writeQueue.catch(() => undefined);
   }
 
+  private deactivate(): void {
+    if (!this.isActive) {
+      return;
+    }
+
+    this.stopAutoPersist();
+    this.isActive = false;
+  }
+
   /** Backwards compatible accessor for the non-reactive content value. */
   public get contentTest(): string {
     return this.contentTest$.value;
@@ -107,12 +122,19 @@ export class Session implements SessionData {
   }
 
   private static async loadOrCreate(): Promise<void> {
+    let savedData: SessionData | null | undefined;
+
     try {
-      const savedData = await Session.storageAdapter.get<SessionData>(Session.STORAGE_KEY);
-      Session.instance = new Session(savedData ?? undefined);
+      savedData = await Session.storageAdapter.get<SessionData>(Session.STORAGE_KEY);
     } catch (error) {
       console.error('Failed to load session, creating new one:', error);
-      Session.instance = new Session();
+    }
+
+    const instance = new Session(savedData ?? undefined);
+    Session.instance = instance;
+
+    if (savedData === undefined) {
+      await instance.save();
     }
   }
 
@@ -125,6 +147,7 @@ export class Session implements SessionData {
     try {
       const previousInstance = Session.instance;
       if (previousInstance) {
+        previousInstance.deactivate();
         await previousInstance.waitForQueuedWrites();
       }
 
