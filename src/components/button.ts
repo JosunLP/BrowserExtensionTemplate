@@ -62,7 +62,12 @@ export function registerBetButton(): void {
     shadow: false,
     props: {
       variant: {
-        type: String as unknown as { new (value: unknown): customButton },
+        type: (value: unknown): customButton => {
+          if (typeof value === 'string' && KNOWN_BUTTON_TYPES.has(value as customButton)) {
+            return value as customButton;
+          }
+          return 'primary';
+        },
         default: 'primary' as customButton,
         validator: (value: unknown): boolean =>
           typeof value === 'string' && KNOWN_BUTTON_TYPES.has(value as customButton),

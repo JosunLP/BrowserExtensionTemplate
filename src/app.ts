@@ -45,12 +45,16 @@ class App {
       </div>`
     );
 
+    // Cache the target element wrapper once so the reactive effect does not
+    // re-query the DOM on every signal update.
+    const contentTest = $('#bet-content-test');
+
     // Reactively mirror the session's content into the DOM. The `effect`
     // re-runs automatically whenever `session.contentTest$` changes, so any
     // update from the Settings page is reflected here in real time without
     // additional plumbing.
     effect(() => {
-      $('#bet-content-test').text(session.contentTest$.value);
+      contentTest.text(session.contentTest$.value);
     });
   }
 
