@@ -15,8 +15,9 @@ interface ExtensionMessage {
 
 class Background {
   private readonly installReason = signal<string | null>(null);
+  private readonly lifecycleEvent = signal<string | null>(null);
   private readonly messageCount = signal(0);
-  private readonly isReady = computed(() => this.installReason.value !== null);
+  private readonly isReady = computed(() => this.lifecycleEvent.value !== null);
 
   constructor() {
     void this.init();
@@ -27,7 +28,7 @@ class Background {
       effect(() => {
         if (this.isReady.value) {
           console.log(
-            `Background ready (installReason=${String(this.installReason.value)}, messages=${this.messageCount.value})`
+            `Background ready (lifecycleEvent=${String(this.lifecycleEvent.value)}, installReason=${String(this.installReason.value)}, messages=${this.messageCount.value})`
           );
         }
       });
@@ -45,6 +46,7 @@ class Background {
     chrome.runtime.onInstalled.addListener(details => {
       console.log('Extension installed:', details.reason);
       this.installReason.value = details.reason;
+      this.lifecycleEvent.value = details.reason;
       this.handleInstall(details.reason);
     });
 
@@ -63,9 +65,7 @@ class Background {
     // Startup event
     chrome.runtime.onStartup.addListener(() => {
       console.log('Extension started');
-      if (this.installReason.value === null) {
-        this.installReason.value = 'startup';
-      }
+      this.lifecycleEvent.value = 'startup';
     });
   }
 
@@ -85,13 +85,19 @@ class Background {
 
     switch (message.type) {
       case 'ping':
-        return { type: 'pong', timestamp: Date.now(), messageCount: this.messageCount.value };
+        return {
+          type: 'pong',
+          timestamp: Date.now(),
+          messageCount: this.messageCount.value,
+          lifecycleEvent: this.lifecycleEvent.value,
+        };
 
       case 'getVersion':
         return {
           type: 'version',
           version: chrome.runtime.getManifest().version,
           installReason: this.installReason.value,
+          lifecycleEvent: this.lifecycleEvent.value,
         };
 
       default:

@@ -47,9 +47,9 @@ export class Session implements SessionData {
       data?.contentTest ?? 'This is a simple example of a web application'
     );
 
-    // Auto-persist whenever the reactive value changes. The first run is a
-    // no-op write of the seeded value which guarantees the storage backend
-    // contains the latest snapshot at all times.
+    // Auto-persist whenever the reactive value changes. The first run also
+    // writes the seeded value, so constructing a session has an immediate
+    // persistence side effect that keeps storage aligned with the snapshot.
     effect(() => {
       void this.enqueueWrite(this.snapshot()).catch(error => {
         console.error('Failed to persist session:', error);

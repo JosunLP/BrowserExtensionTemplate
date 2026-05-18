@@ -23,6 +23,18 @@ interface ManifestJson {
 const FIREFOX_BACKGROUND_BUNDLE = 'background.firefox.js';
 const DEFAULT_MV2_CONTENT_SECURITY_POLICY = "default-src 'self'";
 
+const toPermissionList = (value: unknown): string[] => {
+  if (typeof value === 'string') {
+    return [value];
+  }
+
+  if (Array.isArray(value)) {
+    return value.filter((entry): entry is string => typeof entry === 'string');
+  }
+
+  return [];
+};
+
 buildSync({
   entryPoints: ['./src/background.ts'],
   outfile: `./dist/${FIREFOX_BACKGROUND_BUNDLE}`,
@@ -47,12 +59,12 @@ manifest.background.persistent = true;
 
 if (manifest.host_permissions) {
   manifest.permissions ??= [];
-  manifest.permissions.push(manifest.host_permissions);
+  manifest.permissions.push(...toPermissionList(manifest.host_permissions));
 }
 
 if (manifest.optional_host_permissions) {
   manifest.permissions ??= [];
-  manifest.permissions.push(manifest.optional_host_permissions);
+  manifest.permissions.push(...toPermissionList(manifest.optional_host_permissions));
 }
 
 delete manifest.host_permissions;
