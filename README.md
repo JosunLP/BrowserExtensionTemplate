@@ -31,23 +31,23 @@ A modern, production-ready template for building browser extensions using TypeSc
 ```bash
 git clone https://github.com/JosunLP/BrowserExtensionTemplate.git
 cd BrowserExtensionTemplate
-npm install
+bun install
 ```
 
 ### Development Setup
 
 ```bash
 # Install dependencies
-npm install
+bun install
 
 # Start development mode with auto-rebuild
-npm run dev
+bun run dev
 
 # Type checking
-npm run type-check
+bun run type-check
 
 # Linting and formatting
-npm run validate
+bun run validate
 ```
 
 ## Usage
@@ -98,30 +98,30 @@ The main configuration is in `app.config.json`. This file is automatically synch
 
 ```bash
 # Development
-npm run dev              # Start development with watch mode
-npm run sync            # Sync configuration files
+bun run dev              # Start development with watch mode
+bun run sync            # Sync configuration files
 
 # Production
-npm run deploy-v3       # Build for Chrome (Manifest v3)
-npm run deploy-v2       # Build for Firefox (Manifest v2)
+bun run deploy-v3       # Build for Chrome (Manifest v3)
+bun run deploy-v2       # Build for Firefox (Manifest v2)
 
 # Quality Assurance
-npm run validate        # Type check + lint
-npm run lint           # ESLint with auto-fix
-npm run format         # Prettier formatting
+bun run validate        # Type check + lint
+bun run lint           # ESLint with auto-fix
+bun run format         # Prettier formatting
 
 # Utilities
-npm run clean          # Clean dist folder
-npm run build-tooling  # Compile TypeScript tools
+bun run clean          # Clean dist folder
+bun run build-tooling  # Compile TypeScript tools
 ```
 
 ### Development Workflow
 
 1. **Configure your extension** in `app.config.json`
-2. **Run sync** to update all config files: `npm run sync`
-3. **Start development**: `npm run dev`
+2. **Run sync** to update all config files: `bun run sync`
+3. **Start development**: `bun run dev`
 4. **Write your code** in the `src/` directory
-5. **Build for production**: `npm run deploy-v3` or `npm run deploy-v2`
+5. **Build for production**: `bun run deploy-v3` or `bun run deploy-v2`
 6. **Load the extension** from the `dist/` folder in your browser
 
 ### Session Management
@@ -230,7 +230,7 @@ document.body.insertAdjacentHTML(
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Make your changes and ensure tests pass: `npm run validate`
+3. Make your changes and ensure tests pass: `bun run validate`
 4. Commit your changes: `git commit -m 'Add amazing feature'`
 5. Push to the branch: `git push origin feature/amazing-feature`
 6. Open a Pull Request
@@ -242,7 +242,7 @@ document.body.insertAdjacentHTML(
 - Add proper error handling
 - Write self-documenting code
 - Follow the established project structure
-- Run `npm run validate` before committing
+- Run `bun run validate` before committing
 
 ## License
 

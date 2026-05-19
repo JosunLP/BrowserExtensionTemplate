@@ -1,6 +1,5 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
-import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
   build: {
@@ -28,8 +27,9 @@ export default defineConfig({
     reportCompressedSize: false,
     chunkSizeWarningLimit: 1000,
   },
-  plugins: [tsconfigPaths()],
+  plugins: [],
   resolve: {
+    tsconfigPaths: true,
     extensions: ['.ts', '.tsx', '.js', '.jsx', '.scss', '.sass'],
     alias: {
       '@': resolve(__dirname, './src'),
@@ -61,8 +61,8 @@ export default defineConfig({
           'global-builtin',
           'color-functions',
           'legacy-js-api',
-          'mixed-decls',
           'slash-div',
+          'if-function',
         ],
       },
     },
