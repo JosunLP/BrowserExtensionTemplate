@@ -254,16 +254,3 @@ This project is licensed under the [MIT License](https://opensource.org/licenses
 
 - Email: <info@josunlp.de>
 - GitHub: [@JosunLP](https://github.com/JosunLP)
-
-## Changelog
-
-### v0.0.1 (Current)
-
-- ✨ Modern TypeScript setup with strict type checking
-- 🛡️ Comprehensive error handling system
-- 🎨 CSS Custom Properties with SASS
-- 🔧 ESLint and Prettier configuration
-- 📦 Optimized Vite build system
-- 🚀 Cross-browser compatibility (Chrome/Firefox)
-- 💾 Robust session management
-- 🎯 Component-based architecture
