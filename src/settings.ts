@@ -5,7 +5,6 @@ import { useAnnouncer } from '@bquery/bquery/platform';
 import { effect } from '@bquery/bquery/reactive';
 import { sanitizeHtml } from '@bquery/bquery/security';
 import { Session } from './classes/session';
-import { registerBetButton } from './components/button';
 import './sass/app.sass';
 
 const CONTENT_TEST_REQUIRED_MESSAGE = 'Content test must not be empty';
@@ -25,10 +24,6 @@ class Settings {
 
   private async init(): Promise<void> {
     try {
-      // Ensure the <bet-button> custom element is registered before any
-      // template that references it is parsed.
-      registerBetButton();
-
       this.session = await Session.getInstance();
       this.renderSettings();
     } catch (error) {

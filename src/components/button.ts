@@ -52,8 +52,10 @@ function splitClassNames(value: string): string[] {
 let registered = false;
 
 /**
- * Registers the `<bet-button>` custom element. Safe to call multiple times;
- * the registration is idempotent.
+ * Registers the `<bet-button>` custom element. Importing this module already
+ * attempts registration in browsing contexts, so calling this explicitly is
+ * optional; it remains available for tests or callers that want idempotent,
+ * explicit control over when registration happens.
  */
 export function registerBetButton(): void {
   if (registered || typeof customElements === 'undefined') {
@@ -95,9 +97,10 @@ export function registerBetButton(): void {
   registered = true;
 }
 
-// Register eagerly when running inside a browsing context that exposes
-// `customElements` (popup/options pages). The background service worker has
-// no `customElements` registry; the guard keeps imports side-effect safe.
+// Auto-register on import for popup/options page consumers. The runtime guard
+// keeps the side effect safe in contexts like the background worker where
+// `customElements` is unavailable, and explicit `registerBetButton()` calls
+// remain optional/idempotent for callers that prefer them.
 registerBetButton();
 
 /**

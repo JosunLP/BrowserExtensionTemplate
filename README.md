@@ -206,14 +206,14 @@ Type-safe, reusable components — both as imperative helpers and as native
 Web Components built with bQuery:
 
 ```typescript
-import { BasicButton, registerBetButton } from './components/button';
+import { BasicButton } from './components/button';
 
 // Imperative helper (kept for backward compatibility)
 const button = new BasicButton('primary', 'Click me', 'my-button');
 const buttonElement = button.createElement();
 
-// Or use the <bet-button> Web Component directly in HTML/templates
-registerBetButton();
+// Or use the <bet-button> Web Component directly in HTML/templates.
+// Importing the module auto-registers the custom element in page contexts.
 document.body.insertAdjacentHTML(
   'beforeend',
   '<bet-button variant="success" text="Save"></bet-button>'
