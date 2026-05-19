@@ -47,6 +47,7 @@ class Settings {
       throw new Error('Settings element not found');
     }
     const root = $('#settings');
+    const announcer = useAnnouncer({ politeness: 'polite' });
 
     // Build a reactive form with field-level validation. The initial value
     // is seeded from the persisted session so existing data round-trips.
@@ -63,7 +64,7 @@ class Settings {
         // render sink.
         const sanitizedValue = sanitizeHtml(values.contentTest);
         form.setValues({ contentTest: sanitizedValue });
-        input.val(sanitizedValue);
+        $('#contentTest').val(sanitizedValue);
         const sanitizedValidationResult = validateRequiredContentTest(sanitizedValue);
 
         if (sanitizedValidationResult !== true) {
@@ -80,9 +81,6 @@ class Settings {
         this.showNotification('Settings saved successfully!', 'success');
       },
     });
-
-    // Live region used to announce status updates to assistive technologies.
-    const announcer = useAnnouncer({ politeness: 'polite' });
 
     // Render the surrounding form scaffold with `safeHtml` so interpolated
     // values in this template are escaped here. The nested `<bet-button>`
@@ -110,6 +108,16 @@ class Settings {
     const input = $('#contentTest');
     const errorLabel = $('#contentTest-error');
     const submitButton = $('#saveSettings');
+    const submitSettings = async (event: Event): Promise<void> => {
+      event.preventDefault();
+      try {
+        await form.handleSubmit();
+      } catch (error) {
+        console.error('Failed to save settings:', error);
+        announcer.announce('Failed to save settings', { politeness: 'assertive' });
+        this.showNotification('Failed to save settings', 'error');
+      }
+    };
 
     // Two-way binding between the input and the reactive form field.
     input.on('input', event => {
@@ -142,27 +150,8 @@ class Settings {
       }
     });
 
-    formElement.on('submit', async event => {
-      event.preventDefault();
-      try {
-        await form.handleSubmit();
-      } catch (error) {
-        console.error('Failed to save settings:', error);
-        announcer.announce('Failed to save settings', { politeness: 'assertive' });
-        this.showNotification('Failed to save settings', 'error');
-      }
-    });
-
-    submitButton.on('click', async event => {
-      event.preventDefault();
-      try {
-        await form.handleSubmit();
-      } catch (error) {
-        console.error('Failed to save settings:', error);
-        announcer.announce('Failed to save settings', { politeness: 'assertive' });
-        this.showNotification('Failed to save settings', 'error');
-      }
-    });
+    formElement.on('submit', submitSettings);
+    submitButton.on('click', submitSettings);
   }
 
   private showNotification(message: string, type: 'success' | 'error'): void {
