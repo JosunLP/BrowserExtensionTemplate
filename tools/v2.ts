@@ -36,6 +36,27 @@ const toPermissionList = (value: unknown): string[] => {
   return [];
 };
 
+const toWebAccessibleResourceList = (value: unknown): string[] => {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  if (value.every(entry => typeof entry === 'string')) {
+    return value;
+  }
+
+  return value.flatMap(entry => {
+    if (!entry || typeof entry !== 'object') {
+      return [];
+    }
+
+    const resources = (entry as { resources?: unknown }).resources;
+    return Array.isArray(resources)
+      ? resources.filter((resource): resource is string => typeof resource === 'string')
+      : [];
+  });
+};
+
 buildSync({
   entryPoints: ['./src/background.ts'],
   outfile: `./dist/${FIREFOX_BACKGROUND_BUNDLE}`,
@@ -93,11 +114,8 @@ if (!newContentSecurityPolicy) {
 manifest.content_security_policy = newContentSecurityPolicy;
 
 try {
-  const webAccessibleResources = manifest.web_accessible_resources as
-    | Array<{ resources: string[] }>
-    | undefined;
   manifest.web_accessible_resources = [
-    ...new Set(webAccessibleResources?.flatMap(group => group.resources) ?? []),
+    ...new Set(toWebAccessibleResourceList(manifest.web_accessible_resources)),
   ];
 } catch {
   manifest.web_accessible_resources = [];
