@@ -133,7 +133,7 @@ export class Session implements SessionData {
     const instance = new Session(savedData ?? undefined);
     Session.instance = instance;
 
-    if (savedData === undefined) {
+    if (savedData == null) {
       await instance.save();
     }
   }

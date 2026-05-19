@@ -8,6 +8,14 @@ import { Session } from './classes/session';
 import { registerBetButton } from './components/button';
 import './sass/app.sass';
 
+const CONTENT_TEST_REQUIRED_MESSAGE = 'Content test must not be empty';
+const requiredContentTestValidator = required(CONTENT_TEST_REQUIRED_MESSAGE);
+const validateRequiredContentTest = (
+  value: string
+): true | typeof CONTENT_TEST_REQUIRED_MESSAGE => {
+  return requiredContentTestValidator(value) === true ? true : CONTENT_TEST_REQUIRED_MESSAGE;
+};
+
 class Settings {
   private session: Session | null = null;
 
@@ -46,7 +54,7 @@ class Settings {
       fields: {
         contentTest: {
           initialValue: session.contentTest$.value,
-          validators: [required('Content test must not be empty')],
+          validators: [validateRequiredContentTest],
         },
       },
       onSubmit: async values => {
@@ -54,8 +62,19 @@ class Settings {
         // still requiring context-appropriate escaping/sanitization at every
         // render sink.
         const sanitizedValue = sanitizeHtml(values.contentTest);
-        form.fields.contentTest.value.value = sanitizedValue;
+        form.setValues({ contentTest: sanitizedValue });
         input.val(sanitizedValue);
+        const sanitizedValidationResult = validateRequiredContentTest(sanitizedValue);
+
+        if (sanitizedValidationResult !== true) {
+          const validationMessage = sanitizedValidationResult;
+          form.fields.contentTest.touch();
+          form.setErrors({ contentTest: validationMessage });
+          announcer.announce(validationMessage, { politeness: 'assertive' });
+          this.showNotification(validationMessage, 'error');
+          return;
+        }
+
         session.contentTest = sanitizedValue;
         await session.save();
         announcer.announce('Settings saved successfully');
