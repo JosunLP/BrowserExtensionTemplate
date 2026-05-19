@@ -5,6 +5,7 @@ import { useAnnouncer } from '@bquery/bquery/platform';
 import { effect } from '@bquery/bquery/reactive';
 import { sanitizeHtml } from '@bquery/bquery/security';
 import { Session } from './classes/session';
+import './components/button';
 import './sass/app.sass';
 
 const CONTENT_TEST_REQUIRED_MESSAGE = 'Content test must not be empty';
