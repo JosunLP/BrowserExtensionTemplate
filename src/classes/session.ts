@@ -43,15 +43,20 @@ export class Session implements SessionData {
   private isActive = true;
   private readonly stopAutoPersist: () => void;
 
-  private constructor(data?: Partial<SessionData>) {
+  private constructor(data?: Partial<SessionData>, options?: { skipInitialPersist?: boolean }) {
     this.sessionId = data?.sessionId ?? crypto.randomUUID();
     this.contentTest$ = signal<string>(
       data?.contentTest ?? 'This is a simple example of a web application'
     );
+    const initialSnapshot = this.snapshot();
 
-    // Auto-persist whenever the reactive value changes. The first run also
-    // writes the seeded value, so constructing a session has an immediate
-    // persistence side effect that keeps storage aligned with the snapshot.
+    if (options?.skipInitialPersist) {
+      this.lastQueuedData = initialSnapshot;
+    }
+
+    // Auto-persist whenever the reactive value changes. Fresh sessions write
+    // their seeded snapshot immediately; sessions loaded from storage seed the
+    // queue state first so unchanged startup snapshots do not write again.
     this.stopAutoPersist = effect(() => {
       void this.enqueueWrite(this.snapshot()).catch(error => {
         console.error('Failed to persist session:', error);
@@ -130,7 +135,9 @@ export class Session implements SessionData {
       console.error('Failed to load session, creating new one:', error);
     }
 
-    const instance = new Session(savedData ?? undefined);
+    const instance = new Session(savedData ?? undefined, {
+      skipInitialPersist: savedData != null,
+    });
     Session.instance = instance;
 
     if (savedData == null) {
