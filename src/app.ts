@@ -59,9 +59,8 @@ class App {
 
   private handleError(message: string): void {
     console.error(message);
-    const root = $(`#${App.CONTENT_ENTRY}`);
     if (document.getElementById(App.CONTENT_ENTRY)) {
-      root.html(safeHtml`<div class="error-message">${message}</div>`);
+      $(`#${App.CONTENT_ENTRY}`).html(safeHtml`<div class="error-message">${message}</div>`);
     }
   }
 }

@@ -49,39 +49,6 @@ class Settings {
     const root = $('#settings');
     const announcer = useAnnouncer({ politeness: 'polite' });
 
-    // Build a reactive form with field-level validation. The initial value
-    // is seeded from the persisted session so existing data round-trips.
-    const form = createForm<{ contentTest: string }>({
-      fields: {
-        contentTest: {
-          initialValue: session.contentTest$.value,
-          validators: [validateRequiredContentTest],
-        },
-      },
-      onSubmit: async values => {
-        // Defense in depth: normalize stored markup before persistence, while
-        // still requiring context-appropriate escaping/sanitization at every
-        // render sink.
-        const sanitizedValue = sanitizeHtml(values.contentTest);
-        form.setValues({ contentTest: sanitizedValue });
-        $('#contentTest').val(sanitizedValue);
-        const sanitizedValidationResult = validateRequiredContentTest(sanitizedValue);
-
-        if (sanitizedValidationResult !== true) {
-          const validationMessage = sanitizedValidationResult;
-          form.fields.contentTest.touch();
-          form.setErrors({ contentTest: validationMessage });
-          this.showNotification(validationMessage, 'error');
-          return;
-        }
-
-        session.contentTest = sanitizedValue;
-        await session.save();
-        announcer.announce('Settings saved successfully');
-        this.showNotification('Settings saved successfully!', 'success');
-      },
-    });
-
     // Render the surrounding form scaffold with `safeHtml` so interpolated
     // values in this template are escaped here. The nested `<bet-button>`
     // renders its own internal markup separately.
@@ -108,6 +75,39 @@ class Settings {
     const input = $('#contentTest');
     const errorLabel = $('#contentTest-error');
     const submitButton = $('#saveSettings');
+
+    // Build a reactive form with field-level validation. The initial value
+    // is seeded from the persisted session so existing data round-trips.
+    const form = createForm<{ contentTest: string }>({
+      fields: {
+        contentTest: {
+          initialValue: session.contentTest$.value,
+          validators: [validateRequiredContentTest],
+        },
+      },
+      onSubmit: async values => {
+        // Defense in depth: normalize stored markup before persistence, while
+        // still requiring context-appropriate escaping/sanitization at every
+        // render sink.
+        const sanitizedValue = sanitizeHtml(values.contentTest);
+        form.setValues({ contentTest: sanitizedValue });
+        input.val(sanitizedValue);
+        const sanitizedValidationResult = validateRequiredContentTest(sanitizedValue);
+
+        if (sanitizedValidationResult !== true) {
+          const validationMessage = sanitizedValidationResult;
+          form.fields.contentTest.touch();
+          form.setErrors({ contentTest: validationMessage });
+          this.showNotification(validationMessage, 'error');
+          return;
+        }
+
+        session.contentTest = sanitizedValue;
+        await session.save();
+        announcer.announce('Settings saved successfully');
+        this.showNotification('Settings saved successfully!', 'success');
+      },
+    });
     const submitSettings = async (event: Event): Promise<void> => {
       event.preventDefault();
       try {
