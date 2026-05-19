@@ -13,14 +13,15 @@ A modern, production-ready template for building browser extensions using TypeSc
 ## Features
 
 - 🚀 **Modern Tech Stack**: TypeScript, SASS, Vite, Bootstrap
+- ⚡ **bQuery.js Built-in**: First-class integration of [`@bquery/bquery`](https://bquery.flausch-code.de) — signals, reactive forms, Web Components, sanitized DOM, and the unified storage adapter ship with the template
 - 🛡️ **Type Safety**: Strict TypeScript configuration with comprehensive error checking
 - 🔧 **Development Tools**: ESLint, Prettier, automated workflows
 - 🎯 **Cross-Browser**: Supports both Chrome (Manifest v3) and Firefox (Manifest v2)
-- 📦 **Component System**: Reusable UI components with type safety
-- 💾 **Session Management**: Robust localStorage-based session handling
+- 📦 **Component System**: Reusable UI components with type safety, including a native `<bet-button>` bQuery Web Component
+- 💾 **Session Management**: Reactive session powered by bQuery's `platform/storage` adapter and signals
 - 🛠️ **Build System**: Optimized Vite configuration with code splitting
 - 🎨 **Modern CSS**: CSS Custom Properties with SASS preprocessing
-- 🔒 **Security**: Content Security Policy and secure coding practices
+- 🔒 **Security**: Content Security Policy plus bQuery `safeHtml`/text sinks for DOM rendering and `sanitizeHtml` for settings persistence normalization
 - ⚡ **Error Handling**: Comprehensive error boundary system
 
 ## Installation
@@ -30,23 +31,23 @@ A modern, production-ready template for building browser extensions using TypeSc
 ```bash
 git clone https://github.com/JosunLP/BrowserExtensionTemplate.git
 cd BrowserExtensionTemplate
-npm install
+bun install
 ```
 
 ### Development Setup
 
 ```bash
 # Install dependencies
-npm install
+bun install
 
 # Start development mode with auto-rebuild
-npm run dev
+bun run dev
 
 # Type checking
-npm run type-check
+bun run type-check
 
 # Linting and formatting
-npm run validate
+bun run validate
 ```
 
 ## Usage
@@ -97,53 +98,90 @@ The main configuration is in `app.config.json`. This file is automatically synch
 
 ```bash
 # Development
-npm run dev              # Start development with watch mode
-npm run sync            # Sync configuration files
+bun run dev              # Start development with watch mode
+bun run sync            # Sync configuration files
 
 # Production
-npm run deploy-v3       # Build for Chrome (Manifest v3)
-npm run deploy-v2       # Build for Firefox (Manifest v2)
+bun run deploy-v3       # Build for Chrome (Manifest v3)
+bun run deploy-v2       # Build for Firefox (Manifest v2)
 
 # Quality Assurance
-npm run validate        # Type check + lint
-npm run lint           # ESLint with auto-fix
-npm run format         # Prettier formatting
+bun run validate        # Type check + lint
+bun run lint           # ESLint with auto-fix
+bun run format         # Prettier formatting
 
 # Utilities
-npm run clean          # Clean dist folder
-npm run build-tooling  # Compile TypeScript tools
+bun run clean          # Clean dist folder
+bun run build-tooling  # Compile TypeScript tools
 ```
 
 ### Development Workflow
 
 1. **Configure your extension** in `app.config.json`
-2. **Run sync** to update all config files: `npm run sync`
-3. **Start development**: `npm run dev`
+2. **Run sync** to update all config files: `bun run sync`
+3. **Start development**: `bun run dev`
 4. **Write your code** in the `src/` directory
-5. **Build for production**: `npm run deploy-v3` or `npm run deploy-v2`
+5. **Build for production**: `bun run deploy-v3` or `bun run deploy-v2`
 6. **Load the extension** from the `dist/` folder in your browser
 
 ### Session Management
 
-The template includes a robust session management system:
+Sessions are powered by bQuery's reactive primitives and the unified
+`platform/storage` adapter. The `contentTest` field is exposed both as a
+plain accessor and as a reactive `Signal`, so consumers can subscribe to
+updates without polling:
 
 ```typescript
 import { Session } from './classes/session';
+import { effect } from '@bquery/bquery/reactive';
 
-// Get session instance (async)
 const session = await Session.getInstance();
 
-// Save data
-session.contentTest = 'New value';
-await session.save();
+// Reactive subscription — re-runs on every change.
+effect(() => {
+  console.log('Content changed:', session.contentTest$.value);
+});
 
-// Reset session
-await Session.reset();
+// Either accessor or signal write; both persist via storage.local() automatically.
+session.contentTest = 'New value';
+// Or: session.contentTest$.value = 'New value';
 ```
+
+### bQuery.js Integration
+
+The template wires up [`@bquery/bquery`](https://bquery.flausch-code.de) as a
+first-class dependency. Use any of its tree-shakeable entry points directly
+from `src/`:
+
+```typescript
+import { $, $$ } from '@bquery/bquery/core';
+import { signal, computed, effect } from '@bquery/bquery/reactive';
+import { createForm, required } from '@bquery/bquery/forms';
+import { component, safeHtml, bool } from '@bquery/bquery/component';
+import { escapeHtml, sanitizeHtml } from '@bquery/bquery/security';
+import { storage, useAnnouncer } from '@bquery/bquery/platform';
+```
+
+What ships out of the box:
+
+- **Reactive popup (`src/app.ts`)** — uses `$` for DOM scripting and `effect`
+  to keep the popup in sync with the session signal.
+- **Reactive options page (`src/settings.ts`)** — uses `createForm` for
+  validated form state, `useAnnouncer` for accessible status messages, and
+  bQuery security helpers for render-time escaping plus form-time value
+  normalization before persistence.
+- **`<bet-button>` Web Component (`src/components/button.ts`)** — defined via
+  `component()` with typed props (`variant`, `text`, `disabled`) and
+  rendered through `safeHtml` + `bool()`.
+- **Reactive background worker (`src/background.ts`)** — tracks runtime
+  state (`installReason`, `messageCount`) with signals and `computed`.
+- **Security helpers included** — error rendering uses `escapeHtml`, the
+  options form normalizes persisted text with `sanitizeHtml`, and DOM writes
+  still use context-appropriate escaping/sanitization at the sink.
 
 ### Error Handling
 
-Built-in error boundary system:
+Built-in error boundary system, integrated with bQuery's `escapeHtml`:
 
 ```typescript
 import { ErrorBoundary } from './classes/errorBoundary';
@@ -157,23 +195,29 @@ const safeAsyncFunction = errorBoundary.wrapAsync(asyncFunction);
 errorBoundary.addErrorHandler(error => {
   console.log('Custom error handling:', error);
 });
+
+// Render an error message safely (HTML-escaped via bQuery security)
+element.innerHTML = ErrorBoundary.formatErrorMessage(unsafeMessage);
 ```
 
 ### Component System
 
-Type-safe, reusable components:
+Type-safe, reusable components — both as imperative helpers and as native
+Web Components built with bQuery:
 
 ```typescript
 import { BasicButton } from './components/button';
 
-// Create button
+// Imperative helper (kept for backward compatibility)
 const button = new BasicButton('primary', 'Click me', 'my-button');
-
-// Render as HTML string
-const htmlString = button.render();
-
-// Or create as DOM element
 const buttonElement = button.createElement();
+
+// Or use the <bet-button> Web Component directly in HTML/templates.
+// Importing the module auto-registers the custom element in page contexts.
+document.body.insertAdjacentHTML(
+  'beforeend',
+  '<bet-button variant="success" text="Save"></bet-button>'
+);
 ```
 
 ## Browser Compatibility
@@ -186,7 +230,7 @@ const buttonElement = button.createElement();
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Make your changes and ensure tests pass: `npm run validate`
+3. Make your changes and ensure tests pass: `bun run validate`
 4. Commit your changes: `git commit -m 'Add amazing feature'`
 5. Push to the branch: `git push origin feature/amazing-feature`
 6. Open a Pull Request
@@ -198,7 +242,7 @@ const buttonElement = button.createElement();
 - Add proper error handling
 - Write self-documenting code
 - Follow the established project structure
-- Run `npm run validate` before committing
+- Run `bun run validate` before committing
 
 ## License
 
@@ -210,16 +254,3 @@ This project is licensed under the [MIT License](https://opensource.org/licenses
 
 - Email: <info@josunlp.de>
 - GitHub: [@JosunLP](https://github.com/JosunLP)
-
-## Changelog
-
-### v0.0.1 (Current)
-
-- ✨ Modern TypeScript setup with strict type checking
-- 🛡️ Comprehensive error handling system
-- 🎨 CSS Custom Properties with SASS
-- 🔧 ESLint and Prettier configuration
-- 📦 Optimized Vite build system
-- 🚀 Cross-browser compatibility (Chrome/Firefox)
-- 💾 Robust session management
-- 🎯 Component-based architecture

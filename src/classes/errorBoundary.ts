@@ -1,6 +1,18 @@
+import { escapeHtml } from '@bquery/bquery/security';
+
 export class ErrorBoundary {
   private static instance: ErrorBoundary;
   private errorHandlers: Array<(error: Error) => void> = [];
+
+  /**
+   * Produces an HTML-escaped representation of an error message using
+   * bQuery's security primitives. Use this when surfacing untrusted error
+   * text inside HTML text content; other sinks (for example URLs, styles, or
+   * scriptable attributes) still need context-specific validation/encoding.
+   */
+  public static formatErrorMessage(message: string): string {
+    return escapeHtml(message);
+  }
 
   private constructor() {
     this.setupGlobalErrorHandlers();

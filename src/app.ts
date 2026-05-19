@@ -1,3 +1,6 @@
+import { safeHtml } from '@bquery/bquery/component';
+import { $ } from '@bquery/bquery/core';
+import { effect } from '@bquery/bquery/reactive';
 import { Session } from './classes/session';
 import './sass/app.sass';
 
@@ -6,13 +9,13 @@ class App {
   private session: Session | null = null;
 
   constructor() {
-    this.init();
+    void this.init();
   }
 
   private async init(): Promise<void> {
     try {
       this.session = await Session.getInstance();
-      await this.drawData();
+      this.drawData();
       await this.main();
     } catch (error) {
       console.error('Failed to initialize app:', error);
@@ -24,35 +27,40 @@ class App {
     console.log('Hello World');
   }
 
-  private async drawData(): Promise<void> {
-    if (!this.session) {
+  private drawData(): void {
+    const session = this.session;
+    if (!session) {
       throw new Error('Session not initialized');
     }
 
-    const contentRoot = document.getElementById(App.CONTENT_ENTRY) as HTMLDivElement | null;
-    if (!contentRoot) {
+    if (!document.getElementById(App.CONTENT_ENTRY)) {
       throw new Error(`Element with id '${App.CONTENT_ENTRY}' not found`);
     }
 
-    const body = document.createElement('div');
-    body.className = 'app-content';
+    // Scaffold the static structure once using bQuery's chainable DOM API.
+    $(`#${App.CONTENT_ENTRY}`).empty().append(
+      `<div class="app-content">
+        <h1>Hello World</h1>
+        <p id="bet-content-test"></p>
+      </div>`
+    );
 
-    const title = document.createElement('h1');
-    title.innerText = 'Hello World';
+    // Cache the target element wrapper once so the reactive effect does not
+    // re-query the DOM on every signal update.
+    const contentTest = $('#bet-content-test');
 
-    const text = document.createElement('p');
-    text.innerText = this.session.contentTest;
-
-    body.appendChild(title);
-    body.appendChild(text);
-    contentRoot.appendChild(body);
+    // Reactively mirror this popup's in-memory session signal into the DOM.
+    // This keeps the UI in sync with updates made through the same Session
+    // instance, but it does not add cross-page storage synchronization.
+    effect(() => {
+      contentTest.text(session.contentTest$.value);
+    });
   }
 
   private handleError(message: string): void {
     console.error(message);
-    const contentRoot = document.getElementById(App.CONTENT_ENTRY);
-    if (contentRoot) {
-      contentRoot.innerHTML = `<div class="error-message">${message}</div>`;
+    if (document.getElementById(App.CONTENT_ENTRY)) {
+      $(`#${App.CONTENT_ENTRY}`).html(safeHtml`<div class="error-message">${message}</div>`);
     }
   }
 }

@@ -28,6 +28,7 @@ export default [
         setTimeout: 'readonly',
         clearTimeout: 'readonly',
         crypto: 'readonly',
+        customElements: 'readonly',
         Error: 'readonly',
         JSON: 'readonly',
         Date: 'readonly',
