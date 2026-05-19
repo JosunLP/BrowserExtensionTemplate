@@ -70,7 +70,6 @@ class Settings {
           const validationMessage = sanitizedValidationResult;
           form.fields.contentTest.touch();
           form.setErrors({ contentTest: validationMessage });
-          announcer.announce(validationMessage, { politeness: 'assertive' });
           this.showNotification(validationMessage, 'error');
           return;
         }

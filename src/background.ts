@@ -28,7 +28,7 @@ class Background {
       effect(() => {
         if (this.isReady.value) {
           console.log(
-            `Background ready (lifecycleEvent=${String(this.lifecycleEvent.value)}, installReason=${String(this.installReason.value)}, messages=${this.messageCount.value})`
+            `Background ready (lifecycleEvent=${String(this.lifecycleEvent.value)}, installReason=${String(this.installReason.value)})`
           );
         }
       });
