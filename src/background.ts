@@ -1,15 +1,38 @@
+/**
+ * Background service worker.
+ *
+ * Uses bQuery's reactive primitives to track lightweight runtime state
+ * (install reason, message counters) even outside of a DOM environment.
+ * Reactive state is convenient for diagnostics and can be inspected via the
+ * `getVersion` / `ping` messages from privileged extension pages.
+ */
+import { computed, effect, signal } from '@bquery/bquery/reactive';
+
 interface ExtensionMessage {
   type: string;
   payload?: unknown;
 }
 
 class Background {
+  private readonly installReason = signal<string | null>(null);
+  private readonly lifecycleEvent = signal<string | null>(null);
+  private readonly messageCount = signal(0);
+  private readonly isReady = computed(() => this.lifecycleEvent.value !== null);
+
   constructor() {
-    this.init();
+    void this.init();
   }
 
   private async init(): Promise<void> {
     try {
+      effect(() => {
+        if (this.isReady.value) {
+          console.log(
+            `Background ready (lifecycleEvent=${String(this.lifecycleEvent.value)}, installReason=${String(this.installReason.value)})`
+          );
+        }
+      });
+
       await this.setupEventListeners();
       await this.main();
       console.log('Background service worker initialized');
@@ -22,11 +45,14 @@ class Background {
     // Install event
     chrome.runtime.onInstalled.addListener(details => {
       console.log('Extension installed:', details.reason);
+      this.installReason.value = details.reason;
+      this.lifecycleEvent.value = details.reason;
       this.handleInstall(details.reason);
     });
 
     // Message handling
     chrome.runtime.onMessage.addListener((message: ExtensionMessage, sender, sendResponse) => {
+      this.messageCount.value += 1;
       this.handleMessage(message, sender)
         .then(response => sendResponse(response))
         .catch(error => {
@@ -39,15 +65,14 @@ class Background {
     // Startup event
     chrome.runtime.onStartup.addListener(() => {
       console.log('Extension started');
+      this.lifecycleEvent.value = 'startup';
     });
   }
 
-  private async handleInstall(reason: string): Promise<void> {
+  private handleInstall(reason: string): void {
     if (reason === 'install') {
-      // First time installation
       console.log('Extension installed for the first time');
     } else if (reason === 'update') {
-      // Extension updated
       console.log('Extension updated');
     }
   }
@@ -60,12 +85,19 @@ class Background {
 
     switch (message.type) {
       case 'ping':
-        return { type: 'pong', timestamp: Date.now() };
+        return {
+          type: 'pong',
+          timestamp: Date.now(),
+          messageCount: this.messageCount.value,
+          lifecycleEvent: this.lifecycleEvent.value,
+        };
 
       case 'getVersion':
         return {
           type: 'version',
           version: chrome.runtime.getManifest().version,
+          installReason: this.installReason.value,
+          lifecycleEvent: this.lifecycleEvent.value,
         };
 
       default:
@@ -74,8 +106,7 @@ class Background {
   }
 
   private async main(): Promise<void> {
-    // Main background logic can be implemented here
-    // This method is called after initialization
+    // Main background logic can be implemented here.
   }
 }
 
