@@ -43,6 +43,18 @@ export class Session implements SessionData {
   private isActive = true;
   private readonly stopAutoPersist: () => void;
 
+  private static matchesNormalizedSnapshot(
+    source: Partial<SessionData> | null | undefined,
+    snapshot: SessionData
+  ): boolean {
+    return (
+      typeof source?.sessionId === 'string' &&
+      typeof source?.contentTest === 'string' &&
+      source.sessionId === snapshot.sessionId &&
+      source.contentTest === snapshot.contentTest
+    );
+  }
+
   private constructor(data?: Partial<SessionData>, options?: { skipInitialPersist?: boolean }) {
     this.sessionId = data?.sessionId ?? crypto.randomUUID();
     this.contentTest$ = signal<string>(
@@ -50,7 +62,7 @@ export class Session implements SessionData {
     );
     const initialSnapshot = this.snapshot();
 
-    if (options?.skipInitialPersist) {
+    if (options?.skipInitialPersist && Session.matchesNormalizedSnapshot(data, initialSnapshot)) {
       this.lastQueuedData = initialSnapshot;
     }
 
