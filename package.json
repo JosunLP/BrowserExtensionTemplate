@@ -22,26 +22,22 @@
     "prepare": "bun run validate && bun run build-tooling"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.5",
+    "@eslint/eslintrc": "^3.3.6",
     "@eslint/js": "^10.0.1",
-    "@types/chrome": "^0.1.43",
-    "@types/node": "^25.9.4",
-    "@typescript-eslint/eslint-plugin": "^8.61.1",
-    "@typescript-eslint/parser": "^8.61.1",
+    "@types/chrome": "^0.2.2",
+    "@types/node": "^26.1.1",
+    "@typescript-eslint/eslint-plugin": "^8.65.0",
+    "@typescript-eslint/parser": "^8.65.0",
     "@webcomponents/webcomponentsjs": "^2.8.0",
     "esbuild": "^0.28.1",
-    "eslint": "^10.5.0",
-    "prettier": "^3.8.4",
+    "eslint": "^10.7.0",
+    "prettier": "^3.9.6",
     "rimraf": "^6.1.3",
-    "sass": "^1.101.0",
+    "sass": "^1.101.3",
     "typescript": "^6.0.3",
-    "vite": "^8.0.16"
+    "vite": "^8.1.5"
   },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ],
+  "browserslist": ["> 1%", "last 2 versions", "not dead"],
   "authors": [
     {
       "name": "Jonas Pfalzgraf",
@@ -59,7 +55,7 @@
     "url": "https://github.com/JosunLP/BrowserExtensionTemplate/issues"
   },
   "dependencies": {
-    "@bquery/bquery": "^1.14.1",
+    "@bquery/bquery": "^1.15.1",
     "@webcomponents/custom-elements": "^1.6.0",
     "bootstrap": "^5.3.8"
   }
