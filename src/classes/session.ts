@@ -26,7 +26,12 @@ export class Session implements SessionData {
     left: SessionData | null | undefined,
     right: SessionData | null | undefined
   ): boolean {
-    return !!left && !!right && left.sessionId === right.sessionId && left.contentTest === right.contentTest;
+    return (
+      !!left &&
+      !!right &&
+      left.sessionId === right.sessionId &&
+      left.contentTest === right.contentTest
+    );
   }
 
   public readonly sessionId: string;
