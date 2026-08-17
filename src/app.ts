@@ -38,12 +38,14 @@ class App {
     }
 
     // Scaffold the static structure once using bQuery's chainable DOM API.
-    $(`#${App.CONTENT_ENTRY}`).empty().append(
-      `<div class="app-content">
+    $(`#${App.CONTENT_ENTRY}`)
+      .empty()
+      .append(
+        `<div class="app-content">
         <h1>Hello World</h1>
         <p id="bet-content-test"></p>
       </div>`
-    );
+      );
 
     // Cache the target element wrapper once so the reactive effect does not
     // re-query the DOM on every signal update.

@@ -14,9 +14,9 @@
     "clean": "bunx rimraf ./dist/",
     "dev": "bun run sync && bun run watch",
     "lint": "eslint src/**/*.ts --fix",
-    "format": "prettier --write src/**/*.{ts,json}",
-    "format:ts": "prettier --write src/**/*.ts",
-    "format:json": "prettier --write src/**/*.json",
+    "format": "prettier --write --no-error-on-unmatched-pattern src/**/*.{ts,json}",
+    "format:ts": "prettier --write --no-error-on-unmatched-pattern src/**/*.ts",
+    "format:json": "prettier --write --no-error-on-unmatched-pattern src/**/*.json",
     "type-check": "tsc --noEmit",
     "validate": "bun run type-check && bun run lint",
     "prepare": "bun run validate && bun run build-tooling"
@@ -24,18 +24,18 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.6",
     "@eslint/js": "^10.0.1",
-    "@types/chrome": "^0.2.2",
-    "@types/node": "^26.1.1",
-    "@typescript-eslint/eslint-plugin": "^8.65.0",
-    "@typescript-eslint/parser": "^8.65.0",
+    "@types/chrome": "^0.2.6",
+    "@types/node": "^26.2.0",
+    "@typescript-eslint/eslint-plugin": "^8.67.0",
+    "@typescript-eslint/parser": "^8.67.0",
     "@webcomponents/webcomponentsjs": "^2.8.0",
-    "esbuild": "^0.28.1",
-    "eslint": "^10.7.0",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.8.1",
     "prettier": "^3.9.6",
     "rimraf": "^6.1.3",
-    "sass": "^1.101.3",
+    "sass": "^1.102.0",
     "typescript": "^6.0.3",
-    "vite": "^8.1.5"
+    "vite": "^8.2.1"
   },
   "browserslist": ["> 1%", "last 2 versions", "not dead"],
   "authors": [
@@ -55,7 +55,7 @@
     "url": "https://github.com/JosunLP/BrowserExtensionTemplate/issues"
   },
   "dependencies": {
-    "@bquery/bquery": "^1.15.1",
+    "@bquery/bquery": "^1.16.0",
     "@webcomponents/custom-elements": "^1.6.0",
     "bootstrap": "^5.3.8"
   }
