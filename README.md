@@ -12,15 +12,15 @@ A modern, production-ready template for building browser extensions using TypeSc
 
 ## Features
 
-- 🚀 **Modern Tech Stack**: TypeScript, SASS, Vite, Bootstrap
+- 🚀 **Modern Tech Stack**: TypeScript, SASS, Tailwind CSS, Vite
 - ⚡ **bQuery.js Built-in**: First-class integration of [`@bquery/bquery`](https://bquery.flausch-code.de) — signals, reactive forms, Web Components, sanitized DOM, and the unified storage adapter ship with the template
 - 🛡️ **Type Safety**: Strict TypeScript configuration with comprehensive error checking
 - 🔧 **Development Tools**: ESLint, Prettier, automated workflows
 - 🎯 **Cross-Browser**: Supports both Chrome (Manifest v3) and Firefox (Manifest v2)
 - 📦 **Component System**: Reusable UI components with type safety, including a native `<bet-button>` bQuery Web Component
 - 💾 **Session Management**: Reactive session powered by bQuery's `platform/storage` adapter and signals
-- 🛠️ **Build System**: Optimized Vite configuration with code splitting
-- 🎨 **Modern CSS**: CSS Custom Properties with SASS preprocessing
+- 🛠️ **Build System**: Optimized Vite configuration with entry-based CSS code splitting, source maps, and minification
+- 🎨 **Modern CSS**: Tailwind CSS utilities alongside CSS Custom Properties and SASS preprocessing
 - 🔒 **Security**: Content Security Policy plus bQuery `safeHtml`/text sinks for DOM rendering and `sanitizeHtml` for settings persistence normalization
 - ⚡ **Error Handling**: Comprehensive error boundary system
 
@@ -70,7 +70,7 @@ public/
 ├── popup.html        # Popup HTML template
 └── options.html      # Options page HTML template
 
-tools/                # Build and automation scripts
+tools/                # Build, configuration-sync, parsing, and MV2 conversion scripts
 ```
 
 ### Configuration
@@ -98,31 +98,43 @@ The main configuration is in `app.config.json`. This file is automatically synch
 
 ```bash
 # Development
-bun run dev              # Start development with watch mode
-bun run sync            # Sync configuration files
+bun run dev              # Sync configuration and start Vite in watch mode
+bun run sync             # Sync app.config.json to package.json and manifest.json
 
 # Production
-bun run deploy-v3       # Build for Chrome (Manifest v3)
-bun run deploy-v2       # Build for Firefox (Manifest v2)
+bun run build            # Build the extension and inject generated CSS/template values
+bun run deploy-v3        # Clean, compile tooling, sync config, and build Manifest v3
+bun run deploy-v2        # Build Manifest v3, then convert the output to Manifest v2
 
 # Quality Assurance
-bun run validate        # Type check + lint
-bun run lint           # ESLint with auto-fix
-bun run format         # Prettier formatting
+bun run validate         # Type check + ESLint
+bun run lint             # ESLint with auto-fix
+bun run format           # Prettier formatting
 
 # Utilities
-bun run clean          # Clean dist folder
-bun run build-tooling  # Compile TypeScript tools
+bun run clean            # Clean dist folder
+bun run build-tooling    # Compile TypeScript tools to JavaScript
+bun run parse            # Add generated CSS links and replace HTML placeholders in dist/
 ```
+
+`bun run build` runs Vite and then parses the generated files in `dist/`. The
+parser links every generated CSS chunk into the HTML pages and replaces the
+placeholders configured in `app.config.json`. CSS is split per entry/chunk, so
+the popup and options page only load the styles they need.
 
 ### Development Workflow
 
 1. **Configure your extension** in `app.config.json`
-2. **Run sync** to update all config files: `bun run sync`
-3. **Start development**: `bun run dev`
+2. **Run sync** to update `package.json` and `public/manifest.json`: `bun run sync`
+3. **Start development** with Vite watch mode: `bun run dev`
 4. **Write your code** in the `src/` directory
 5. **Build for production**: `bun run deploy-v3` or `bun run deploy-v2`
 6. **Load the extension** from the `dist/` folder in your browser
+
+`app.config.json` is the source of truth for extension metadata. The build
+tooling is written in TypeScript and compiled before synchronization or
+deployment. The generated `dist/` directory is ready to load as an unpacked
+extension.
 
 ### Session Management
 
@@ -223,7 +235,8 @@ document.body.insertAdjacentHTML(
 ## Browser Compatibility
 
 - **Chrome**: Manifest v3 (recommended)
-- **Firefox**: Manifest v2 (automatically converted)
+- **Firefox**: Manifest v2 (automatically converted; the background service worker
+  is bundled as a persistent background script)
 - **Edge**: Manifest v3 compatible
 
 ## Contributing
