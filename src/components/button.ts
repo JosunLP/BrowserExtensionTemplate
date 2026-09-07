@@ -25,24 +25,25 @@ export interface ButtonConfig {
   onClick?: (() => void) | undefined;
 }
 
-const BOOTSTRAP_CLASS_MAP: Record<customButton, string> = {
-  neutral: 'btn btn-secondary',
-  primary: 'btn btn-primary',
-  secondary: 'btn btn-secondary',
-  success: 'btn btn-success',
-  danger: 'btn btn-danger',
-  warning: 'btn btn-warning',
-  info: 'btn btn-info',
-  light: 'btn btn-light',
-  dark: 'btn btn-dark',
+const BUTTON_CLASS_MAP: Record<customButton, string> = {
+  neutral: 'bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500',
+  primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
+  secondary: 'bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500',
+  success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500',
+  danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
+  warning: 'bg-yellow-400 text-gray-900 hover:bg-yellow-500 focus:ring-yellow-400',
+  info: 'bg-cyan-600 text-white hover:bg-cyan-700 focus:ring-cyan-500',
+  light: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-300',
+  dark: 'bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-700',
 };
 
-const KNOWN_BUTTON_TYPES = new Set<customButton>(
-  Object.keys(BOOTSTRAP_CLASS_MAP) as customButton[]
-);
+const BASE_BUTTON_CLASSES =
+  'inline-flex items-center justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50';
 
-function resolveBootstrapClass(type: customButton): string {
-  return BOOTSTRAP_CLASS_MAP[type] ?? BOOTSTRAP_CLASS_MAP.primary;
+const KNOWN_BUTTON_TYPES = new Set<customButton>(Object.keys(BUTTON_CLASS_MAP) as customButton[]);
+
+function resolveButtonClass(type: customButton): string {
+  return `${BASE_BUTTON_CLASSES} ${BUTTON_CLASS_MAP[type] ?? BUTTON_CLASS_MAP.primary}`;
 }
 
 function splitClassNames(value: string): string[] {
@@ -85,7 +86,7 @@ export function registerBetButton(): void {
       disabled: { type: Boolean, default: false },
     },
     render({ props }) {
-      const cls = resolveBootstrapClass(props.variant);
+      const cls = resolveButtonClass(props.variant);
       return safeHtml`
         <button type="button" class="${cls}" ${bool('disabled', props.disabled)}>
           ${props.text}
@@ -104,7 +105,7 @@ export function registerBetButton(): void {
 registerBetButton();
 
 /**
- * Imperative button helper. Internally uses the same bootstrap class map as
+ * Imperative button helper. Internally uses the same Tailwind class map as
  * the `<bet-button>` web component so both APIs stay visually consistent.
  */
 export class BasicButton {
@@ -120,7 +121,7 @@ export class BasicButton {
   }
 
   public render(): string {
-    const baseClass = resolveBootstrapClass(this.config.type);
+    const baseClass = resolveButtonClass(this.config.type);
     const extraClass = this.config.className ?? '';
     const id = this.config.id ?? '';
     return safeHtml`<button
@@ -137,7 +138,7 @@ export class BasicButton {
 
     $button.attr('type', 'button');
     $button.text(this.config.text);
-    $button.addClass(...splitClassNames(resolveBootstrapClass(this.config.type)));
+    $button.addClass(...splitClassNames(resolveButtonClass(this.config.type)));
 
     if (this.config.id) {
       $button.attr('id', this.config.id);

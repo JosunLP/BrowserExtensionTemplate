@@ -6,16 +6,24 @@
     <link rel="icon" href="./favicon.ico" />
     <title>{{BET}}</title>
   </head>
-  <body>
+  <body class="extension-body">
     <noscript>
       <strong
         >We're sorry but {{BET}} doesn't work properly without JavaScript enabled. Please enable it
         to continue.</strong
       >
     </noscript>
-    <div id="app">
-      <img src="./icons/icon128.png" alt="Logo" class="logo" />
-      <h1>{{BET}}</h1>
+    <div id="app" class="extension-shell">
+      <header class="app-topbar">
+        <div class="brand-mark">
+          <img src="./icons/icon128.png" alt="" class="logo" />
+        </div>
+        <div class="brand-copy">
+          <span class="eyebrow">{{BET}}</span>
+          <span class="brand-title">Quick view</span>
+        </div>
+        <span class="status-pill"><span class="status-dot"></span>Ready</span>
+      </header>
       <div id="content"></div>
     </div>
     <footer>

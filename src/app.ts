@@ -3,6 +3,7 @@ import { $ } from '@bquery/bquery/core';
 import { effect } from '@bquery/bquery/reactive';
 import { Session } from './classes/session';
 import './sass/app.sass';
+import './sass/tailwind.css';
 
 class App {
   private static readonly CONTENT_ENTRY = 'content';
@@ -41,10 +42,30 @@ class App {
     $(`#${App.CONTENT_ENTRY}`)
       .empty()
       .append(
-        `<div class="app-content">
-        <h1>Hello World</h1>
-        <p id="bet-content-test"></p>
-      </div>`
+        `<main class="app-content">
+          <section class="welcome-card">
+            <div class="welcome-icon" aria-hidden="true">✦</div>
+            <div class="welcome-copy">
+              <span class="section-kicker">Your personal space</span>
+              <h1>Welcome back</h1>
+              <p>Everything important, right where you left it.</p>
+            </div>
+          </section>
+          <section class="content-card" aria-labelledby="saved-content-title">
+            <div class="content-card-header">
+              <div>
+                <span class="section-kicker">Saved for you</span>
+                <h2 id="saved-content-title">Your content</h2>
+              </div>
+              <span class="card-icon" aria-hidden="true">↗</span>
+            </div>
+            <p id="bet-content-test" class="saved-content"></p>
+          </section>
+          <footer class="app-footer">
+            <span class="footer-dot"></span>
+            Stored securely on this device
+          </footer>
+        </main>`
       );
 
     // Cache the target element wrapper once so the reactive effect does not

@@ -13,7 +13,7 @@ function findCssFileNames(source: string): string[] {
       files = files.concat(findCssFileNames(sourceFile));
     } else {
       if (path.extname(sourceFile) === '.css') {
-        files.push(file);
+        files.push(path.relative(DEPLOY_TARGET, sourceFile));
       }
     }
   });
@@ -44,7 +44,6 @@ function replaceKeywordsInHtmlFile(file: string) {
     //@ts-ignore
     content = content.replaceAll(pair.key, pair.value);
   });
-  file = file.replace('public\\', DEPLOY_TARGET);
   fs.writeFileSync(file, content);
 }
 
@@ -59,10 +58,10 @@ findCssFileNames(DEPLOY_TARGET).forEach((file: string) => {
   const files = findHtmlFilesRecursive(DEPLOY_TARGET);
   files.forEach(function (htmlFile: string) {
     let content = fs.readFileSync(htmlFile, 'utf8');
-    content = content.replace(
-      '</head>',
-      `<link rel="stylesheet" href="./assets/${file}">\n</head>`
-    );
+    const href = `./${file.split(path.sep).join('/')}`;
+    if (!content.includes(`href="${href}"`)) {
+      content = content.replace('</head>', `<link rel="stylesheet" href="${href}">\n</head>`);
+    }
     fs.writeFileSync(htmlFile, content);
   });
 });

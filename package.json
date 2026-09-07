@@ -6,7 +6,7 @@
   "scripts": {
     "deploy-v3": "bun run clean && bun run build-tooling && bun run sync && bun run build && bun run parse",
     "deploy-v2": "bun run deploy-v3 && bun ./tools/v2.js",
-    "build": "vite build",
+    "build": "vite build && bun run parse",
     "build-tooling": "tsc --project ./tooling.tsconfig.json",
     "watch": "vite build --watch",
     "sync": "bun run build-tooling && bun ./tools/syncConfig.js",
@@ -22,26 +22,28 @@
     "prepare": "bun run validate && bun run build-tooling"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.6",
+    "@eslint/eslintrc": "^3.3.7",
     "@eslint/js": "^10.0.1",
-    "@types/chrome": "^0.2.6",
-    "@types/node": "^26.2.0",
-    "@typescript-eslint/eslint-plugin": "^8.67.0",
-    "@typescript-eslint/parser": "^8.67.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/chrome": "^0.2.9",
+    "@types/node": "^26.4.1",
+    "@typescript-eslint/eslint-plugin": "^8.69.0",
+    "@typescript-eslint/parser": "^8.69.0",
     "@webcomponents/webcomponentsjs": "^2.8.0",
     "esbuild": "^0.28.2",
-    "eslint": "^10.8.1",
+    "eslint": "^10.10.0",
     "prettier": "^3.9.6",
     "rimraf": "^6.1.3",
-    "sass": "^1.102.0",
+    "sass": "^1.104.0",
+    "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3",
-    "vite": "^8.2.1"
+    "vite": "^8.2.2"
   },
   "browserslist": ["> 1%", "last 2 versions", "not dead"],
   "authors": [
     {
       "name": "Jonas Pfalzgraf",
-      "email": "info@josunlp.de"
+      "email": "support@josunlp.de"
     }
   ],
   "description": "A basic template based on SASS and TypeScript to create browser extensions without directly relying on a larger framework.",
@@ -55,8 +57,7 @@
     "url": "https://github.com/JosunLP/BrowserExtensionTemplate/issues"
   },
   "dependencies": {
-    "@bquery/bquery": "^1.16.0",
-    "@webcomponents/custom-elements": "^1.6.0",
-    "bootstrap": "^5.3.8"
+    "@bquery/bquery": "^1.16.1",
+    "@webcomponents/custom-elements": "^1.6.0"
   }
 }

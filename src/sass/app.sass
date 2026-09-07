@@ -2,50 +2,279 @@
 @import 'mixin'
 @import 'content'
 
-// Bootstrap with legacy import (suppressed warnings via Vite config)
-@import "../../node_modules/bootstrap/scss/bootstrap"
-
 body
-  height: 30rem
+  min-height: 30rem
   width: 30rem
-  background-color: $background-color
-  text-align: center
-  margin: auto
-  padding: 1rem
-  color: $main-font-color
+  margin: 0
+  color: #17233d
+  background: #f5f7fb
+  font-family: 'Ubuntu', 'Segoe UI', sans-serif
 
-  p
-    font-size: 1rem
-    font-weight: bold
-    margin: auto
-    padding: auto
-    color: $main-font-color
-    text-align: center
-    font-family: 'Roboto', sans-serif
+.extension-body
+  min-height: 30rem
+  background: radial-gradient(circle at 100% 0%, #dbeafe 0, transparent 32%), #f5f7fb
 
-h1, h2
-  @include noselect
+.options-body
+  min-height: 34rem
 
-form
-  @include formBasic
+.extension-shell
+  min-height: 30rem
+  padding: 1.1rem 1rem 1rem
+
+.app-topbar
+  display: flex
+  align-items: center
+  gap: 0.7rem
+  margin-bottom: 1.15rem
+
+.brand-mark
+  display: grid
+  width: 2.6rem
+  height: 2.6rem
+  place-items: center
+  border: 1px solid rgba(255, 255, 255, 0.8)
+  border-radius: 0.85rem
+  background: linear-gradient(145deg, #2563eb, #7c3aed)
+  box-shadow: 0 0.55rem 1.2rem rgba(37, 99, 235, 0.26)
 
 .logo
-  width: 5rem
-  height: auto
-  padding-top: 2rem
-  @include noselect
+  width: 1.7rem
+  height: 1.7rem
+  object-fit: contain
 
-svg
-  @include noselect
+.brand-copy
+  display: grid
+  gap: 0.08rem
 
-table
-  color: $main-font-color !important
+.eyebrow, .section-kicker
+  color: #66728f
+  font-size: 0.62rem
+  font-weight: 700
+  letter-spacing: 0.12em
+  text-transform: uppercase
 
-  th
-    @include noselect
+.brand-title
+  color: #17233d
+  font-size: 0.95rem
+  font-weight: 700
 
-a
-  color: $main-font-color
+.status-pill
+  display: inline-flex
+  align-items: center
+  gap: 0.35rem
+  margin-left: auto
+  padding: 0.35rem 0.55rem
+  border: 1px solid #dbe4f2
+  border-radius: 999px
+  background: rgba(255, 255, 255, 0.7)
+  color: #66728f
+  font-size: 0.65rem
+  font-weight: 700
 
-  &:hover
-    color: $background-color-content
+.status-dot, .footer-dot
+  width: 0.4rem
+  height: 0.4rem
+  border-radius: 50%
+  background: #22c55e
+  box-shadow: 0 0 0 0.18rem rgba(34, 197, 94, 0.12)
+
+.app-content
+  display: grid
+  gap: 0.8rem
+
+.welcome-card, .content-card, .settings-panel
+  border: 1px solid rgba(219, 228, 242, 0.9)
+  border-radius: 1.1rem
+  background: rgba(255, 255, 255, 0.88)
+  box-shadow: 0 1rem 2rem rgba(44, 62, 96, 0.08)
+
+.welcome-card
+  display: flex
+  align-items: center
+  gap: 0.8rem
+  padding: 1rem
+  background: linear-gradient(135deg, #eef4ff, #ffffff 70%)
+
+.welcome-icon
+  display: grid
+  flex: 0 0 auto
+  width: 2.8rem
+  height: 2.8rem
+  place-items: center
+  border-radius: 0.85rem
+  background: #e0e7ff
+  color: #4f46e5
+  font-size: 1.35rem
+
+.welcome-copy, .settings-heading
+  display: grid
+  gap: 0.25rem
+
+.welcome-copy h1, .settings-heading h1
+  margin: 0
+  color: #17233d
+  font-size: 1.35rem
+  line-height: 1.15
+
+.welcome-copy p, .settings-heading p
+  margin: 0
+  color: #66728f
+  font-size: 0.78rem
+  line-height: 1.45
+
+.content-card
+  padding: 1rem
+
+.content-card-header
+  display: flex
+  align-items: flex-start
+  justify-content: space-between
+  margin-bottom: 0.7rem
+
+.content-card h2
+  margin: 0.18rem 0 0
+  color: #17233d
+  font-size: 1rem
+
+.card-icon
+  display: grid
+  width: 1.8rem
+  height: 1.8rem
+  place-items: center
+  border-radius: 0.6rem
+  background: #eff6ff
+  color: #2563eb
+  font-weight: 700
+
+.saved-content
+  min-height: 3rem
+  margin: 0
+  padding: 0.8rem
+  border-radius: 0.7rem
+  background: #f8fafc
+  color: #334155
+  font-size: 0.85rem
+  line-height: 1.5
+
+.app-footer
+  display: flex
+  align-items: center
+  justify-content: center
+  gap: 0.45rem
+  padding: 0.45rem 0
+  color: #8a96ad
+  font-size: 0.65rem
+
+.settings-panel
+  padding: 1.15rem
+
+.settings-heading
+  padding-bottom: 1rem
+  border-bottom: 1px solid #edf1f7
+
+.settings-heading h1
+  font-size: 1.45rem
+
+.settings-form
+  display: grid
+  gap: 1rem
+  margin-top: 1rem
+
+.field-group
+  display: grid
+  gap: 0.35rem
+
+.field-group label
+  color: #263653
+  font-size: 0.78rem
+  font-weight: 700
+
+.field-hint
+  color: #8a96ad
+  font-size: 0.68rem
+
+.text-input
+  width: 100%
+  box-sizing: border-box
+  margin-top: 0.25rem
+  padding: 0.75rem 0.8rem
+  border: 1px solid #dbe4f2
+  border-radius: 0.7rem
+  outline: none
+  background: #fbfcfe
+  color: #17233d
+  font: inherit
+  font-size: 0.82rem
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease
+
+  &:focus
+    border-color: #5b7cfa
+    background: #ffffff
+    box-shadow: 0 0 0 0.2rem rgba(91, 124, 250, 0.14)
+
+  &[aria-invalid='true']
+    border-color: #ef4444
+
+.field-error
+  min-height: 1rem
+  color: #dc2626
+  font-size: 0.68rem
+
+.form-actions
+  display: flex
+  align-items: center
+  justify-content: space-between
+  gap: 0.75rem
+  padding-top: 0.25rem
+
+.save-hint
+  display: inline-flex
+  align-items: center
+  gap: 0.35rem
+  color: #8a96ad
+  font-size: 0.67rem
+
+.save-hint-icon
+  display: grid
+  width: 1rem
+  height: 1rem
+  place-items: center
+  border-radius: 50%
+  background: #dcfce7
+  color: #16a34a
+  font-size: 0.6rem
+  font-weight: 700
+
+#saveSettingsSlot bet-button
+  display: block
+
+.notification
+  position: fixed
+  right: 1rem
+  bottom: 1rem
+  z-index: 1000
+  max-width: 18rem
+  padding: 0.75rem 1rem
+  border: 1px solid transparent
+  border-radius: 0.75rem
+  box-shadow: 0 1rem 2rem rgba(44, 62, 96, 0.16)
+  font-size: 0.75rem
+  font-weight: 600
+
+.notification-success
+  border-color: #bbf7d0
+  background: #f0fdf4
+  color: #166534
+
+.notification-error
+  border-color: #fecaca
+  background: #fef2f2
+  color: #991b1b
+
+.error-message
+  padding: 1rem
+  border: 1px solid #fecaca
+  border-radius: 0.8rem
+  background: #fef2f2
+  color: #991b1b
+  font-size: 0.8rem
